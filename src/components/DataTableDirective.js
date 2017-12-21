@@ -105,10 +105,10 @@ export default function DataTableDirective($window, $timeout, $parse) {
           }
 
           function calculateResize() {
-            throttle(() => {
               $timeout(resize);
-            });
           }
+          
+          $scope.$on('dt-resize', calculateResize);
 
           $window.addEventListener('resize', calculateResize);
 

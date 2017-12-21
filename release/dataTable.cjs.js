@@ -1262,45 +1262,6 @@ var DataTableController = function () {
  * @param  {object}
  */
 
-
-function throttle(func, wait, options) {
-  var _this5 = this;
-
-  return function () {
-    for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-      args[_key] = arguments[_key];
-    }
-
-    var localOptions = options || (options = {});
-
-    var result = void 0;
-    var timeout = null;
-    var previous = 0;
-
-    var later = function later() {
-      previous = localOptions.leading === false ? 0 : new Date();
-      timeout = null;
-      result = func.apply(_this5, args);
-    };
-
-    var now = new Date();
-    if (!previous && localOptions.leading === false) {
-      previous = now;
-    }
-    var remaining = wait - (now - previous);
-
-    if (remaining <= 0) {
-      clearTimeout(timeout);
-      timeout = null;
-      previous = now;
-      result = func.apply(_this5, args);
-    } else if (!timeout && localOptions.trailing !== false) {
-      timeout = setTimeout(later, remaining);
-    }
-    return result;
-  };
-}
-
 var DataTableService = {
 
   // id: [ column defs ]
@@ -1320,13 +1281,13 @@ var DataTableService = {
    * @param  {array} columnElms
    */
   buildColumns: function buildColumns(scope, parse) {
-    var _this6 = this;
+    var _this5 = this;
 
     // FIXME: Too many nested for loops.  O(n3)
 
     // Iterate through each dTable
     angular.forEach(this.dTables, function (columnElms, id) {
-      _this6.columns[id] = [];
+      _this5.columns[id] = [];
 
       // Iterate through each column
       angular.forEach(columnElms, function (c) {
@@ -1373,7 +1334,7 @@ var DataTableService = {
         }
 
         if (visible) {
-          _this6.columns[id].push(column);
+          _this5.columns[id].push(column);
         }
       });
     });
@@ -1457,10 +1418,10 @@ function DataTableDirective($window, $timeout, $parse) {
           }
 
           function calculateResize() {
-            throttle(function () {
-              $timeout(resize);
-            });
+            $timeout(resize);
           }
+
+          $scope.$on('dt-resize', calculateResize);
 
           $window.addEventListener('resize', calculateResize);
 
@@ -1937,7 +1898,7 @@ var BodyController = function () {
   }, {
     key: 'init',
     value: function init() {
-      var _this7 = this;
+      var _this6 = this;
 
       this.tempRows = [];
       this.watchListeners = [];
@@ -1947,20 +1908,20 @@ var BodyController = function () {
 
       this.$scope.$watch('body.options.columns', function (newVal) {
         if (newVal) {
-          var origTreeColumn = angular.copy(_this7.treeColumn);
-          var origGroupColumn = angular.copy(_this7.groupColumn);
+          var origTreeColumn = angular.copy(_this6.treeColumn);
+          var origGroupColumn = angular.copy(_this6.groupColumn);
 
-          _this7.setTreeAndGroupColumns();
+          _this6.setTreeAndGroupColumns();
 
-          _this7.setConditionalWatches();
+          _this6.setConditionalWatches();
 
-          if (_this7.treeColumn && origTreeColumn !== _this7.treeColumn || _this7.groupColumn && origGroupColumn !== _this7.groupColumn) {
-            _this7.rowsUpdated(_this7.rows);
+          if (_this6.treeColumn && origTreeColumn !== _this6.treeColumn || _this6.groupColumn && origGroupColumn !== _this6.groupColumn) {
+            _this6.rowsUpdated(_this6.rows);
 
-            if (_this7.treeColumn) {
-              _this7.refreshTree();
-            } else if (_this7.groupColumn) {
-              _this7.refreshGroups();
+            if (_this6.treeColumn) {
+              _this6.refreshTree();
+            } else if (_this6.groupColumn) {
+              _this6.refreshGroups();
             }
           }
         }
@@ -2009,7 +1970,7 @@ var BodyController = function () {
   }, {
     key: 'setConditionalWatches',
     value: function setConditionalWatches() {
-      var _this8 = this;
+      var _this7 = this;
 
       for (var i = this.watchListeners.length - 1; i >= 0; i -= 1) {
         this.watchListeners[i]();
@@ -2022,26 +1983,26 @@ var BodyController = function () {
 
         this.watchListeners.push(this.$scope.$watch('body.options.paging.size', function (newVal, oldVal) {
           if (!sized || newVal > oldVal) {
-            _this8.getRows();
+            _this7.getRows();
             sized = true;
           }
         }));
 
         this.watchListeners.push(this.$scope.$watch('body.options.paging.count', function (count) {
-          _this8.count = count;
-          _this8.updatePage();
+          _this7.count = count;
+          _this7.updatePage();
         }));
 
         this.watchListeners.push(this.$scope.$watch('body.options.paging.offset', function (newVal) {
-          if (_this8.options.paging.size) {
-            if (_this8.options.paging.mode === 'internal') {
-              _this8.buildInternalPage();
+          if (_this7.options.paging.size) {
+            if (_this7.options.paging.mode === 'internal') {
+              _this7.buildInternalPage();
             }
 
-            if (_this8.onPage) {
-              _this8.onPage({
+            if (_this7.onPage) {
+              _this7.onPage({
                 offset: newVal,
-                size: _this8.options.paging.size
+                size: _this7.options.paging.size
               });
             }
           }
@@ -2282,7 +2243,7 @@ var BodyController = function () {
   }, {
     key: 'buildGroups',
     value: function buildGroups() {
-      var _this9 = this;
+      var _this8 = this;
 
       var temp = [];
 
@@ -2292,7 +2253,7 @@ var BodyController = function () {
           group: true
         });
 
-        if (_this9.expanded[k]) {
+        if (_this8.expanded[k]) {
           temp.push.apply(temp, _toConsumableArray(v));
         }
       });
@@ -3323,12 +3284,12 @@ var FooterController = function () {
   }, {
     key: 'init',
     value: function init() {
-      var _this10 = this;
+      var _this9 = this;
 
       this.page = this.paging.offset + 1;
 
       this.$scope.$watch('footer.paging.offset', function (newVal) {
-        _this10.offsetChanged(newVal);
+        _this9.offsetChanged(newVal);
       });
     }
 
@@ -3405,19 +3366,19 @@ var PagerController = function () {
   }, {
     key: 'init',
     value: function init() {
-      var _this11 = this;
+      var _this10 = this;
 
       this.$scope.$watch('pager.count', function () {
-        _this11.findAndSetPages();
+        _this10.findAndSetPages();
       });
 
       this.$scope.$watch('pager.size', function () {
-        _this11.findAndSetPages();
+        _this10.findAndSetPages();
       });
 
       this.$scope.$watch('pager.page', function (newVal) {
-        if (newVal !== 0 && newVal <= _this11.totalPages) {
-          _this11.getPages(newVal);
+        if (newVal !== 0 && newVal <= _this10.totalPages) {
+          _this10.getPages(newVal);
         }
       });
 
