@@ -4,5 +4,4104 @@
  * @link http://jonshaffer.github.io/angular-data-table/
  * @license MIT
  */
-"use strict";function _toConsumableArray(e){if(Array.isArray(e)){for(var t=0,n=Array(e.length);t<e.length;t++)n[t]=e[t];return n}return Array.from(e)}function _classCallCheck(e,t){if(!(e instanceof t))throw new TypeError("Cannot call a class as a function")}function ResizableDirective(e,t){return{restrict:"A",scope:{isResizable:"=resizable",minWidth:"=",maxWidth:"=",onResize:"&"},link:function(n,o){function i(e){e=e.originalEvent||e;var t=s[0].clientWidth,o=e.movementX||e.mozMovementX||e.screenX-a,i=t+(o||0);a=e.screenX,(!n.minWidth||i>=n.minWidth)&&(!n.maxWidth||i<=n.maxWidth)&&s.css({width:i+"px"})}function r(){n.onResize&&t(function(){var e=s[0].clientWidth;e<n.minWidth&&(e=n.minWidth),n.onResize({width:e})}),e.unbind("mousemove",i),e.unbind("mouseup",r)}n.isResizable&&o.addClass("resizable");var l=angular.element('<span class="dt-resize-handle" title="Resize"></span>'),s=o.parent(),a=void 0;l.on("mousedown",function(t){o[0].classList.contains("resizable")&&(t.stopPropagation(),t.preventDefault(),e.on("mousemove",i),e.on("mouseup",r))}),o.append(l)}}}function SortableDirective(){return{restrict:"A",scope:{isSortable:"=sortable",onSortableSort:"&"},link:function(e,t){function n(e,t){if(e.parentNode===t.parentNode)for(var n=e;n;n=n.previousSibling)if(n===t)return!0;return!1}function o(e){var t=e.target;n(l,t)?t.parentNode.insertBefore(l,t):t.nextSibling&&t.hasAttribute("draggable")&&t.parentNode.insertBefore(l,t.nextSibling.nextSibling)}function i(n){n.preventDefault(),l.classList.remove("dt-clone"),t.off("dragend",i),t.off("dragenter",o),s!==l.nextSibling&&e.onSortableSort({event:n,columnId:angular.element(l).attr("data-id")})}function r(n){e.isSortable&&(n=n.originalEvent||n,l=n.target,s=l.nextSibling,l.classList.add("dt-clone"),n.dataTransfer.effectAllowed="move",n.dataTransfer.setData("Text",l.textContent),t.on("dragenter",o),t.on("dragend",i))}var l=void 0,s=void 0;t.on("dragstart",r),e.$on("$destroy",function(){t.off("dragstart",r)})}}}function ObjectId(){return Math.floor((new Date).getTime()/1e3).toString(16)+"xxxxxxxxxxxxxxxx".replace(/[x]/g,function(){return Math.floor(16*Math.random()).toString(16)}).toLowerCase()}function ColumnsByPin(e){for(var t={left:[],center:[],right:[]},n=0,o=e.length;n<o;n+=1){var i=e[n];i.frozenLeft?t.left.push(i):i.frozenRight?t.right.push(i):t.center.push(i)}return t}function ColumnGroupWidths(e,t){return{left:ColumnTotalWidth(e.left),center:ColumnTotalWidth(e.center),right:ColumnTotalWidth(e.right),total:ColumnTotalWidth(t)}}function DeepValueGetter(e,t){if(!e||!t)return e;var n=t.split("."),o=e;if(n.length)for(var i=0,r=n.length;i<r;i+=1)o=o[n[i]];return o}function CamelCase(e){return e=e.replace(/[^a-zA-Z0-9 ]/g," "),e=e.replace(/([a-z](?=[A-Z]))/g,"$1 "),e=e.replace(/([^a-zA-Z0-9 ])|^[0-9]+/g,"").trim().toLowerCase(),e=e.replace(/([ 0-9]+)([a-zA-Z])/g,function(e,t,n){return t.trim()+n.toUpperCase()})}function ScrollbarWidth(){var e=document.createElement("div");e.style.visibility="hidden",e.style.width="100px",e.style.msOverflowStyle="scrollbar",document.body.appendChild(e);var t=e.offsetWidth;e.style.overflow="scroll";var n=document.createElement("div");n.style.width="100%",e.appendChild(n);var o=n.offsetWidth;return e.parentNode.removeChild(e),t-o}function NextSortDirection(e,t){return"single"===e?"asc"===t?"desc":"asc":t?"asc"===t?"desc":void 0:"asc"}function isOldAngular(){return 1===angular.version.major&&angular.version.minor<5}function ColumnTotalWidth(e,t){var n=0;return e.forEach(function(e){var o=t&&e[t];n+=o?e[t]:e.width}),n}function GetTotalFlexGrow(e){var t=0;return e.forEach(function(e){t+=e.flexGrow||0}),t}function AdjustColumnWidths(e,t){var n=ColumnTotalWidth(e),o=GetTotalFlexGrow(e),i=ColumnsByPin(e);n!==t&&ScaleColumns(i,t,o)}function ScaleColumns(e,t,n){function o(e,t){e.forEach(function(e,n){if(e.canAutoResize&&!i[n]){var o=e.width+e.flexGrow*t;angular.isDefined(e.minWidth)&&o<e.minWidth?(r+=o-e.minWidth,e.width=e.minWidth,i[n]=!0):e.width=o}})}angular.forEach(e,function(e){e.forEach(function(e){e.canAutoResize?e.width=0:(t-=e.width,n-=e.flexGrow)})});var i={},r=t;do{!function(){var t=r/n;r=0,angular.forEach(e,function(e){o(e,t)})}()}while(0!==r)}function ForceFillColumnWidths(e,t,n){var o=0,i=n>-1?e.slice(n,e.length).filter(function(e){return e.canAutoResize}):e.filter(function(e){return e.canAutoResize});e.forEach(function(e){e.canAutoResize?o+=e.$$oldWidth||e.width:o+=e.width});var r=t-o,l=r/i.length,s=o>t;i.forEach(function(e){if(s)e.width=e.$$oldWidth||e.width;else{e.$$oldWidth||(e.$$oldWidth=e.width);var t=e.$$oldWidth+l;e.minWith&&t<e.minWidth?e.width=e.minWidth:e.maxWidth&&t>e.maxWidth?e.width=e.maxWidth:e.width=t}})}function throttle(e,t,n){var o=this;return function(){for(var i=arguments.length,r=Array(i),l=0;l<i;l++)r[l]=arguments[l];var s=n||(n={}),a=void 0,c=null,u=0,d=function(){u=!1===s.leading?0:new Date,c=null,a=e.apply(o,r)},h=new Date;u||!1!==s.leading||(u=h);var p=t-(h-u);return p<=0?(clearTimeout(c),c=null,u=h,a=e.apply(o,r)):c||!1===s.trailing||(c=setTimeout(d,p)),a}}function DataTableDirective(e,t,n){return{restrict:"E",replace:!0,controller:DataTableController,scope:!0,bindToController:{options:"=",rows:"=",selected:"=?",expanded:"=?",onSelect:"&",onSort:"&",onTreeToggle:"&",onPage:"&",onRowClick:"&",onRowDblClick:"&",onColumnResize:"&"},controllerAs:"dt",template:function(e){var t=e[0].getElementsByTagName("column"),n=ObjectId();return DataTableService.saveColumns(n,t),'<div class="dt" ng-class="dt.tableCss()" data-column-id="'+n+'">\n          <dt-header options="dt.options"\n                     columns="dt.columnsByPin"\n                     column-widths="dt.columnWidths"\n                     ng-if="dt.options.headerHeight"\n                     on-resize="dt.onResized(column, width)"\n                     selected-rows="dt.selected"\n                     all-rows="dt.rows"\n                     on-sort="dt.onSorted()">\n          </dt-header>\n          <dt-body rows="dt.rows"\n                   selected="dt.selected"\n                   expanded="dt.expanded"\n                   columns="dt.columnsByPin"\n                   on-select="dt.onSelected(rows)"\n                   on-row-click="dt.onRowClicked(row)"\n                   on-row-dbl-click="dt.onRowDblClicked(row)"\n                   column-widths="dt.columnWidths"\n                   options="dt.options"\n                   on-page="dt.onBodyPage(offset, size)"\n                   on-tree-toggle="dt.onTreeToggled(row, cell)">\n           </dt-body>\n          <dt-footer ng-if="dt.options.footerHeight || dt.options.paging.mode"\n                     ng-style="{ height: dt.options.footerHeight + \'px\' }"\n                     on-page="dt.onFooterPage(offset, size)"\n                     paging="dt.options.paging">\n           </dt-footer>\n        </div>'},compile:function(){return{pre:function(o,i,r,l){function s(){var e=i[0].getBoundingClientRect();if(l.options.internal.innerWidth=Math.floor(e.width),l.options.scrollbarV){var t=e.height;l.options.headerHeight&&(t-=l.options.headerHeight),l.options.footerHeight&&(t-=l.options.footerHeight),l.options.internal.bodyHeight=t,l.calculatePageSize()}l.adjustColumns()}function a(){throttle(function(){t(s)})}DataTableService.buildColumns(o,n);var c=i.attr("data-column-id"),u=DataTableService.columns[c];u&&(l.options.columns=u),l.inheritColumnSortableProps(),l.transposeColumnDefaults(),l.options.internal.scrollBarWidth=ScrollbarWidth(),e.addEventListener("resize",a);!function e(){var n=i[0].getBoundingClientRect();n.width&&n.height?s():t(e,100)}(),i.addClass("dt-loaded"),o.$on("$destroy",function(){angular.element(e).off("resize")})}}}}}function GetVendorPrefixedName(e){var t=CamelCase(e);return cache[t]||(angular.isDefined(testStyle[prefix.css+e])?cache[t]=prefix.css+e:angular.isDefined(testStyle[e])&&(cache[t]=e)),cache[t]}function TranslateXY(e,t,n){hasCSSTransforms?!isSafari&&hasCSS3DTransforms?(e[transform]="translate3d("+t+"px, "+n+"px, 0)",e[backfaceVisibility]="hidden"):e[CamelCase(transform)]="translate("+t+"px, "+n+"px)":(e.top=n+"px",e.left=t+"px")}function HeaderDirective(e){return{restrict:"E",controller:HeaderController,controllerAs:"header",scope:!0,bindToController:{options:"=",columns:"=",columnWidths:"=",selectedRows:"=?",allRows:"=",onSort:"&",onResize:"&"},template:'\n      <div class="dt-header" ng-style="header.styles()">\n        <div class="dt-header-inner" ng-style="header.innerStyles()">\n          <div class="dt-row-left"\n               ng-style="header.stylesByGroup(\'left\')"\n               ng-if="header.columns[\'left\'].length"\n               sortable="header.options.reorderable"\n               on-sortable-sort="columnsResorted(event, columnId)">\n            <dt-header-cell\n              ng-repeat="column in header.columns[\'left\'] track by column.$id"\n              on-sort="header.onSorted(column, modifierPressed)"\n              options="header.options"\n              sort-type="header.options.sortType"\n              on-resize="header.onResized(column, width)"\n              all-rows="header.allRows"\n              column="column">\n            </dt-header-cell>\n          </div>\n          <div class="dt-row-center"\n               sortable="header.options.reorderable"\n               ng-style="header.stylesByGroup(\'center\')"\n               on-sortable-sort="columnsResorted(event, columnId)">\n            <dt-header-cell\n              ng-repeat="column in header.columns[\'center\'] track by column.$id"\n              on-checkbox-change="header.onCheckboxChanged()"\n              on-sort="header.onSorted(column, modifierPressed)"\n              sort-type="header.options.sortType"\n              selected="header.isSelected()"\n              on-resize="header.onResized(column, width)"\n              options="header.options"\n              column="column">\n            </dt-header-cell>\n          </div>\n          <div class="dt-row-right"\n               ng-if="header.columns[\'right\'].length"\n               sortable="header.options.reorderable"\n               ng-style="header.stylesByGroup(\'right\')"\n               on-sortable-sort="columnsResorted(event, columnId)">\n            <dt-header-cell\n              ng-repeat="column in header.columns[\'right\'] track by column.$id"\n              on-checkbox-change="header.onCheckboxChanged()"\n              on-sort="header.onSorted(column, modifierPressed)"\n              sort-type="header.options.sortType"\n              selected="header.isSelected()"\n              on-resize="header.onResized(column, width)"\n              options="header.options"\n              column="column">\n            </dt-header-cell>\n          </div>\n        </div>\n      </div>',replace:!0,link:function(t,n,o,i){t.columnsResorted=function(t,n){var o=r(n),l=angular.element(t.currentTarget),s=-1;angular.forEach(l.children(),function(e,t){n===angular.element(e).attr("data-id")&&(s=t)}),e(function(){angular.forEach(i.columns,function(e){if(e.indexOf(o)>-1){var t=e[s],n=i.options.columns.indexOf(t),r=i.options.columns.indexOf(o);return i.options.columns.splice(r,1),i.options.columns.splice(n,0,o),!1}})})};var r=function(e){return i.columns.left.concat(i.columns.center).concat(i.columns.right).find(function(t){return t.$id===e})}}}}function HeaderCellDirective(e){return{restrict:"E",controller:HeaderCellController,controllerAs:"hcell",scope:!0,bindToController:{options:"=",column:"=",onSort:"&",sortType:"=",onResize:"&",selected:"="},replace:!0,template:'<div ng-class="hcell.cellClass()"\n            class="dt-header-cell"\n            draggable="true"\n            data-id="{{column.$id}}"\n            ng-style="hcell.styles()"\n            title="{{::hcell.column.name}}">\n        <div resizable="hcell.column.resizable"\n             on-resize="hcell.onResized(width, hcell.column)"\n             min-width="hcell.column.minWidth"\n             max-width="hcell.column.maxWidth">\n          <label ng-if="hcell.column.isCheckboxColumn && hcell.column.headerCheckbox" class="dt-checkbox">\n            <input type="checkbox"\n                   ng-model="hcell.column.allRowsSelected"\n                   ng-change="hcell.checkboxChangeCallback()" />\n          </label>\n          <span class="dt-header-cell-label"\n                ng-click="hcell.onSorted($event)">\n          </span>\n          <span ng-class="hcell.sortClass()">{{hcell.column.sortPriority}}</span>\n        </div>\n      </div>',compile:function(){return{pre:function(t,n,o,i){var r=n[0].querySelector(".dt-header-cell-label"),l=void 0;if((i.column.headerTemplate||i.column.headerRenderer)&&(l=i.options.$outer.$new(!1),l.$header=i.column.name,l.$index=t.$index),i.column.headerTemplate){var s=angular.element("<span>"+i.column.headerTemplate.trim()+"</span>");angular.element(r).append(e(s)(l))}else if(i.column.headerRenderer){var a=angular.element(i.column.headerRenderer(n));angular.element(r).append(e(a)(l)[0])}else{var c=i.column.name;(angular.isUndefined(c)||null===c)&&(c=""),r.textContent=c}}}}}}function BodyDirective(){return{restrict:"E",controller:BodyController,controllerAs:"body",bindToController:{columns:"=",columnWidths:"=",rows:"=",options:"=",selected:"=?",expanded:"=?",onPage:"&",onTreeToggle:"&",onSelect:"&",onRowClick:"&",onRowDblClick:"&"},scope:!0,template:'\n      <div\n        class="progress-linear"\n        role="progressbar"\n        ng-show="body.options.loadingIndicator">\n        <div class="container">\n          <div class="bar"></div>\n        </div>\n      </div>\n      <div class="dt-body" ng-style="body.styles()" dt-selection>\n        <dt-scroller class="dt-body-scroller">\n          <dt-group-row ng-repeat-start="r in body.tempRows track by $index"\n                        ng-if="r.group"\n                        ng-style="body.groupRowStyles(r)"\n                        options="body.options"\n                        on-group-toggle="body.onGroupToggle(group)"\n                        expanded="body.getRowExpanded(r)"\n                        tabindex="{{$index}}"\n                        row="r">\n          </dt-group-row>\n          <dt-row ng-repeat-end\n                  ng-if="!r.group"\n                  row="body.getRowValue($index)"\n                  tabindex="{{$index}}"\n                  columns="body.columns"\n                  column-widths="body.columnWidths"\n                  ng-keydown="selCtrl.keyDown($event, $index, r)"\n                  ng-click="selCtrl.rowClicked($event, r.$$index, r)"\n                  ng-dblclick="selCtrl.rowDblClicked($event, r.$$index, r)"\n                  on-tree-toggle="body.onTreeToggled(row, cell)"\n                  ng-class="body.rowClasses(r)"\n                  options="body.options"\n                  selected="body.isSelected(r)"\n                  on-checkbox-change="selCtrl.onCheckboxChange($event, $index, row)"\n                  columns="body.columnsByPin"\n                  has-children="body.getRowHasChildren(r)"\n                  expanded="body.getRowExpanded(r)"\n                  ng-style="body.rowStyles(r)">\n          </dt-row>\n        </dt-scroller>\n        <div ng-if="body.rows && !body.rows.length"\n             class="empty-row"\n             ng-bind="::body.options.emptyMessage">\n       </div>\n       <div ng-if="body.rows === undefined"\n             class="loading-row"\n             ng-bind="::body.options.loadingMessage">\n        </div>\n      </div>'}}function ScrollerDirective(){return{restrict:"E",require:"^dtBody",transclude:!0,replace:!0,template:'<div ng-style="scrollerStyles()" ng-transclude></div>',link:function(e,t,n,o){function i(){o.options.internal.offsetY=a,o.options.internal.offsetX=c,o.updatePage(),o.options.scrollbarV&&o.getRows(!0),o.options.$outer.$digest(),s=!1}function r(){s||(requestAnimFrame(i),s=!0)}var l=t.parent(),s=!1,a=0,c=0;o.options.internal.styleTranslator=new StyleTranslator(o.options.rowHeight),o.options.internal.setYOffset=function(e){l[0].scrollTop=e},l.on("scroll",function(){a=this.scrollTop,c=this.scrollLeft,r()}),e.$on("$destroy",function(){l.off("scroll")}),e.scrollerStyles=function(){if(o.options.scrollbarV)return{height:o.count*o.options.rowHeight+"px"}}}}}function SelectionDirective(){return{controller:SelectionController,restrict:"A",require:"^dtBody",controllerAs:"selCtrl"}}function RowDirective(){return{restrict:"E",controller:RowController,controllerAs:"rowCtrl",scope:!0,bindToController:{row:"=",columns:"=",columnWidths:"=",expanded:"=",selected:"=",hasChildren:"=",options:"=",onCheckboxChange:"&",onTreeToggle:"&"},link:function(e,t,n,o){o.row&&TranslateXY(t[0].style,0,o.row.$$index*o.options.rowHeight),o.options.internal.styleTranslator.register(e.$index,t)},template:'\n      <div class="dt-row">\n        <div class="dt-row-left dt-row-block"\n             ng-if="rowCtrl.columns[\'left\'].length"\n             ng-style="rowCtrl.stylesByGroup(\'left\')">\n          <dt-cell ng-repeat="column in rowCtrl.columns[\'left\'] track by column.$id"\n                   on-tree-toggle="rowCtrl.onTreeToggled(cell)"\n                   column="column"\n                   options="rowCtrl.options"\n                   has-children="rowCtrl.hasChildren"\n                   on-checkbox-change="rowCtrl.onCheckboxChanged($event)"\n                   selected="rowCtrl.selected"\n                   expanded="rowCtrl.expanded"\n                   row="rowCtrl.row"\n                   value="rowCtrl.getValue(column)">\n          </dt-cell>\n        </div>\n        <div class="dt-row-center dt-row-block"\n             ng-style="rowCtrl.stylesByGroup(\'center\')">\n          <dt-cell ng-repeat="column in rowCtrl.columns[\'center\'] track by column.$id"\n                   on-tree-toggle="rowCtrl.onTreeToggled(cell)"\n                   column="column"\n                   options="rowCtrl.options"\n                   has-children="rowCtrl.hasChildren"\n                   expanded="rowCtrl.expanded"\n                   selected="rowCtrl.selected"\n                   row="rowCtrl.row"\n                   on-checkbox-change="rowCtrl.onCheckboxChanged($event)"\n                   value="rowCtrl.getValue(column)">\n          </dt-cell>\n        </div>\n        <div class="dt-row-right dt-row-block"\n             ng-if="rowCtrl.columns[\'right\'].length"\n             ng-style="rowCtrl.stylesByGroup(\'right\')">\n          <dt-cell ng-repeat="column in rowCtrl.columns[\'right\'] track by column.$id"\n                   on-tree-toggle="rowCtrl.onTreeToggled(cell)"\n                   column="column"\n                   options="rowCtrl.options"\n                   has-children="rowCtrl.hasChildren"\n                   selected="rowCtrl.selected"\n                   on-checkbox-change="rowCtrl.onCheckboxChanged($event)"\n                   row="rowCtrl.row"\n                   expanded="rowCtrl.expanded"\n                   value="rowCtrl.getValue(column)">\n          </dt-cell>\n        </div>\n      </div>',replace:!0}}function GroupRowDirective(){return{restrict:"E",controller:GroupRowController,controllerAs:"group",bindToController:{row:"=",onGroupToggle:"&",expanded:"=",options:"="},scope:!0,replace:!0,template:'\n      <div class="dt-group-row">\n        <span ng-class="group.treeClass()"\n              ng-click="group.onGroupToggled($event)">\n        </span>\n        <span class="dt-group-row-label" ng-bind="group.row.name">\n        </span>\n      </div>',link:function(e,t,n,o){TranslateXY(t[0].style,0,o.row.$$index*o.options.rowHeight),o.options.internal.styleTranslator.register(e.$index,t)}}}function CellDirective(e,t){return{restrict:"E",controller:CellController,scope:!0,controllerAs:"cell",bindToController:{options:"=",value:"=",selected:"=",column:"=",row:"=",expanded:"=",hasChildren:"=",onTreeToggle:"&",onCheckboxChange:"&"},template:'<div class="dt-cell"\n            data-title="{{::cell.column.name}}"\n            ng-style="cell.styles()"\n            ng-class="cell.cellClass()">\n        <label ng-if="cell.column.isCheckboxColumn" class="dt-checkbox">\n          <input type="checkbox"\n                 ng-checked="cell.selected"\n                 ng-click="cell.onCheckboxChanged($event)" />\n        </label>\n        <span ng-if="cell.column.isTreeColumn && cell.hasChildren"\n              ng-class="cell.treeClass()"\n              ng-click="cell.onTreeToggled($event)"></span>\n        <span class="dt-cell-content"></span>\n      </div>',replace:!0,compile:function(){return{pre:function(e,n,o,i){function r(){s=i.options.$outer.$new(!1),s.getValue=i.getValue}var l=angular.element(n[0].querySelector(".dt-cell-content")),s=void 0;(i.column.template||i.column.cellRenderer)&&r(),e.$watch("cell.row",function(){if(s&&(s.$destroy(),r(),s.$cell=i.value,s.$row=i.row,s.$column=i.column,s.$$watchers=null),i.column.template){l.empty();var e=angular.element("<span>"+i.column.template.trim()+"</span>");l.append(t(e)(s))}else if(i.column.cellRenderer){l.empty();var n=angular.element(i.column.cellRenderer(s,l));l.append(t(n)(s))}else l[0].innerHTML=i.getValue()},!0)}}}}}function FooterDirective(){return{restrict:"E",controller:FooterController,controllerAs:"footer",scope:!0,bindToController:{paging:"=",onPage:"&"},template:'<div class="dt-footer">\n        <div class="page-count">{{footer.paging.count}} total</div>\n        <dt-pager page="footer.page"\n               size="footer.paging.size"\n               count="footer.paging.count"\n               on-page="footer.onPaged(page)"\n               ng-show="footer.paging.count / footer.paging.size > 1">\n         </dt-pager>\n      </div>',replace:!0}}function PagerDirective(){return{restrict:"E",controller:PagerController,controllerAs:"pager",scope:!0,bindToController:{page:"=",size:"=",count:"=",onPage:"&"},template:'<div class="dt-pager">\n        <ul class="pager">\n          <li ng-class="{ disabled: !pager.canPrevious() }">\n            <a href ng-click="pager.selectPage(1)" class="icon-prev"></a>\n          </li>\n          <li ng-class="{ disabled: !pager.canPrevious() }">\n            <a href ng-click="pager.prevPage()" class="icon-left"></a>\n          </li>\n          <li ng-repeat="pg in pager.pages track by $index" ng-class="{ active: pg.active }">\n            <a href ng-click="pager.selectPage(pg.number)">{{pg.text}}</a>\n          </li>\n          <li ng-class="{ disabled: !pager.canNext() }">\n            <a href ng-click="pager.nextPage()" class="icon-right"></a>\n          </li>\n          <li ng-class="{ disabled: !pager.canNext() }">\n            <a href ng-click="pager.selectPage(pager.totalPages)" class="icon-skip"></a>\n          </li>\n        </ul>\n      </div>',replace:!0}}function PopoverDirective(e,t,n,o,i,r,l,s,a){function c(e,t){return e?angular.isString(e)&&t?e:r.get(e)||o.get(e,{cache:!0}):""}function u(e){if(e&&0!==e.length){e="true"===e.toString().toLowerCase()}else e=!1;return e}return{restrict:"A",scope:!0,replace:!1,link:function(o,r,d){function h(){o.exitTimeout=l(C,500)}function p(){l.cancel(o.exitTimeout)}function g(){p();var e=n[0].getElementById(o.options.popoverId);o.popover&&e||(o.options.text&&!o.options.template?m():f())}function f(){i.when(c(o.options.template,o.options.plain)).then(function(e){angular.isString(e)||(e=e.data&&angular.isString(e.data)?e.data:""),v("template"),o.popover.html(e),t(o.popover)(o),angular.element(n.body).append(o.popover),y(r,o.popover,o.options),w()})}function m(){v("text"),o.popover.html(o.options.text),angular.element(n[0].body).append(o.popover),w()}function v(e){o.popover=angular.element('<div\n          class="dt-popover popover'+o.options.placement+'"\n          id="'+o.options.popoverId+'"></div>'),"text"===e&&o.popover.addClass("popover-text")}function w(){y(r,o.popover,o.options),o.popover.on("mouseleave",h),o.popover.on("mousemove",p),s.add(o.options.popoverId,{element:r,popover:o.popover})}function C(){o.popover&&(o.popover.off(),o.popover.remove()),o.popover=null,s.remove(o.options.popoverId)}function y(t,n,i){l(function(){function r(){return a.calculateVerticalAlignment(s,c,i.alignment)}function l(){return a.calculateHorizontalAlignment(s,c,i.alignment)}var s=t[0].getBoundingClientRect(),c=n[0].getBoundingClientRect(),u=void 0,d=void 0;i.placement===POSITION.RIGHT?(d=s.left+s.width+i.spacing,u=r()):i.placement===POSITION.LEFT?(d=s.left-c.width-i.spacing,u=r()):i.placement===POSITION.TOP?(u=s.top-c.height-i.spacing,d=l()):i.placement===POSITION.BOTTOM&&(u=s.top+s.height+i.spacing,d=l()),n.css({top:u+"px",left:d+"px",height:"300px"}),o.options.showCaret&&b(o.popover,s,c),e.addClass(o.popover,"popover-animation")},50)}function b(e,t,n){function i(){return a.calculateVerticalCaret(t,n,s,o.options.alignment)}function r(){return a.calculateHorizontalCaret(t,n,s,o.options.alignment)}var l=angular.element('<span class="popover-caret caret-'+o.options.placement+'"></span>');e.append(l);var s=l[0].getBoundingClientRect(),c=void 0,u=void 0;o.options.placement===POSITION.RIGHT?(c=-6,u=i()):o.options.placement===POSITION.LEFT?(c=n.width-2,u=i()):o.options.placement===POSITION.TOP?(u=n.height-5,c=r()):o.options.placement===POSITION.BOTTOM&&(u=-8,c=r()),l.css({top:u+"px",left:c+"px"})}o.popover=null,o.options={alignment:d.popoverAlignment||"middle",placement:d.popoverPlacement||"right",plain:u(d.popoverPlain||!1),popoverId:d.popoverId,showCaret:u(d.popoverPlain||!1),spacing:parseInt(d.popoverSpacing,10)||0,template:d.popoverTemplate,text:d.popoverText},o.$on("$destroy",function(){r.off()}),r.on("mouseenter",g),r.on("mouseleave",h),r.on("mousemove",p)}}}function PopoverRegistry(){var e={};return{add:function(t,n){return e[t]=n,e[t]},find:function(t){return e[t]},remove:function(t){delete e[t]}}}function PositionHelper(e){function t(e){var t=0;return e.forEach(function(e,n){t=0===n?t+=e:t-=e}),t}return{calculateHorizontalAlignment:function(t,n,o){switch(o){case POSITION.LEFT:return t.left;case POSITION.RIGHT:return t.left+(t.width-n.width);case POSITION.CENTER:return t.left+(t.width/2-n.width/2);default:return e.warn("calculateHorizontalAlignment issue",this)}},calculateVerticalAlignment:function(t,n,o){switch(o){case POSITION.TOP:return t.top;case POSITION.BOTTOM:return t.top+(t.height-n.height);case POSITION.MIDDLE:return t.top+(t.height/2-n.height/2);default:return e.warn("calculateVerticalAlignment issue",this)}},calculateVerticalCaret:function(n,o,i,r){switch(r){case POSITION.TOP:return t([n.height/2,i.height/2,1]);case POSITION.BOTTOM:return t([o.height,n.height/2,i.height/2,1]);case POSITION.MIDDLE:return t([o.height/2,i.height/2,1]);default:return e.warn("calculateVerticalCaret issue",this)}},calculateHorizontalCaret:function(n,o,i,r){switch(r){case POSITION.LEFT:return t([n.width/2,i.height/2,1]);case POSITION.RIGHT:return t([o.width,n.width/2,i.height/2,1]);case POSITION.CENTER:return t([o.width/2,i.height/2,1]);default:return e.warn("calculateHorizontalCaret issue",this)}}}}function MenuDirective(){return{restrict:"E",controller:"MenuController",controllerAs:"dtm",scope:{current:"=",available:"="},template:'<div class="dt-menu dropdown" close-on-click="false">\n        <a href="#" class="dropdown-toggle icon-add">\n          Configure Columns\n        </a>\n        <div class="dropdown-menu" role="menu" aria-labelledby="dropdown">\n          <div class="keywords">\n            <input type="text"\n                   click-select\n                   placeholder="Filter columns..."\n                   ng-model="columnKeyword"\n                   autofocus />\n          </div>\n          <ul>\n            <li ng-repeat="column in available | filter:columnKeyword">\n              <label class="dt-checkbox">\n                <input type="checkbox"\n                       ng-checked="dtm.isChecked(column)"\n                       ng-click="dtm.onCheck(column)">\n                {{column.name}}\n              </label>\n            </li>\n          </ul>\n        </div>\n      </div>'}}function DropdownDirective(e,t){return{restrict:"C",controller:"DropdownController",link:function(n,o){function i(e){o[0].contains(e.target)||t(function(){n.open=!1,l()})}function r(e){27===e.which&&t(function(){n.open=!1,l()})}function l(){e.unbind("click",i),e.unbind("keydown",r)}n.$watch("open",function(t){t&&(e.bind("click",i),e.bind("keydown",r))})}}}function DropdownToggleDirective(e){return{restrict:"C",controller:"DropdownController",require:"?^dropdown",link:function(t,n,o,i){function r(t){t.preventDefault(),e(function(){i.toggle()})}function l(){n.unbind("click",r)}n.bind("click",r),t.$on("$destroy",l)}}}function DropdownMenuDirective(e){return{restrict:"C",require:"?^dropdown",link:function(t,n){t.$watch("open",function(){e[t.open?"addClass":"removeClass"](n,"ddm-open")})}}}PositionHelper.$inject=["$log"],PopoverDirective.$inject=["$animate","$compile","$document","$http","$q","$templateCache","$timeout","PopoverRegistry","PositionHelper"],DropdownDirective.$inject=["$document","$timeout"],DropdownToggleDirective.$inject=["$timeout"],DropdownMenuDirective.$inject=["$animate"],DataTableDirective.$inject=["$window","$timeout","$parse"],ResizableDirective.$inject=["$document","$timeout"],HeaderDirective.$inject=["$timeout"],HeaderCellDirective.$inject=["$compile"],CellDirective.$inject=["$rootScope","$compile"],Object.defineProperty(exports,"__esModule",{value:!0});var _extends=Object.assign||function(e){for(var t=1;t<arguments.length;t++){var n=arguments[t];for(var o in n)Object.prototype.hasOwnProperty.call(n,o)&&(e[o]=n[o])}return e},_createClass=function(){function e(e,t){for(var n=0;n<t.length;n++){var o=t[n];o.enumerable=o.enumerable||!1,o.configurable=!0,"value"in o&&(o.writable=!0),Object.defineProperty(e,o.key,o)}}return function(t,n,o){return n&&e(t.prototype,n),o&&e(t,o),t}}();!function(){Array.prototype.find||Object.defineProperty(Array.prototype,"find",{value:function(e,t){if(null==this)throw new TypeError("Array.prototype.find called on null or undefined");if(!angular.isFunction(e))throw new TypeError("predicate must be a function");for(var n=Object(this),o=n.length>>>0,i=void 0,r=0;r<o;r+=1)if(i=n[r],e.call(t,i,r,n))return i}}),Array.prototype.findIndex||Object.defineProperty(Array.prototype,"findIndex",{value:function(e,t){if(null==this)throw new TypeError("Array.prototype.findIndex called on null or undefined");if(!angular.isFunction(e))throw new TypeError("predicate must be a function");for(var n=Object(this),o=n.length>>>0,i=void 0,r=0;r<o;r+=1)if(i=n[r],e.call(t,i,r,n))return r;return-1},enumerable:!1,configurable:!1,writable:!1})}();var TableDefaults={checkboxSelection:!1,columnMode:"standard",emptyMessage:"No data to display",footerHeight:0,headerHeight:30,internal:{offsetX:0,offsetY:0,innerWidth:0,bodyHeight:300},loadingIndicator:!1,loadingMessage:"Loading...",multiSelect:!1,paging:{count:0,offset:0,mode:null,size:10},reorderable:!0,rowHeight:30,scrollbarV:!0,selectable:!1,sortable:!0,sortType:"multiple",modifierActive:!0},ColumnDefaults={canAutoResize:!0,cellDataGetter:void 0,cellRenderer:void 0,className:void 0,comparator:void 0,flexGrow:0,frozenLeft:!1,frozenRight:!1,group:!1,headerCheckbox:!1,headerClassName:void 0,headerRenderer:void 0,isCheckboxColumn:!1,isTreeColumn:!1,maxWidth:void 0,minWidth:100,resizable:!0,sort:void 0,sortable:!0,sortBy:void 0,width:150},requestAnimFrame=function(){return window.requestAnimationFrame||window.webkitRequestAnimationFrame||window.mozRequestAnimationFrame||window.oRequestAnimationFrame||window.msRequestAnimationFrame||function(e){window.setTimeout(e,1e3/60)}}(),DataTableController=function(){function e(t,n){_classCallCheck(this,e),_extends(this,{$scope:t,$filter:n}),isOldAngular()&&this.$onInit()}return e.$inject=["$scope","$filter"],_createClass(e,[{key:"$onInit",value:function(){this.init()}},{key:"init",value:function(){var e=this;this.defaults(),this.options.$outer=this.$scope.$parent,this.$scope.$watch("dt.options.columns",function(t,n){
-e.transposeColumnDefaults(),t.length!==n.length&&e.adjustColumns(),e.calculateColumns()},!0),this.$scope.$watchCollection("dt.rows",function(t,n){t&&n&&t.length>n.length&&e.onSorted()})}},{key:"defaults",value:function(){var e=this;this.expanded=this.expanded||{},this.options=_extends({},TableDefaults,this.options),angular.forEach(TableDefaults.paging,function(t,n){e.options.paging[n]||(e.options.paging[n]=t)}),this.options.selectable&&this.options.multiSelect&&(this.selected=this.selected||[],this.$scope.$watch("dt.selected",function(){angular.forEach(e.options.columns,function(t){t.headerCheckbox&&angular.isFunction(t.headerCheckboxCallback)&&t.headerCheckboxCallback(e)})},!0))}},{key:"transposeColumnDefaults",value:function(){for(var e=this,t=0,n=this.options.columns.length;t<n;t+=1)!function(t,n){var o=e.options.columns[t];o.$id=ObjectId(),angular.forEach(ColumnDefaults,function(e,t){Object.prototype.hasOwnProperty.call(o,t)||(o[t]=e)}),o.name&&!o.prop&&(o.prop=CamelCase(o.name)),e.options.columns[t]=o}(t)}},{key:"inheritColumnSortableProps",value:function(){var e=this;angular.forEach(this.options.columns,function(t){t.sortable=angular.isDefined(t.sortable)?t.sortable:e.options.sortable})}},{key:"calculateColumns",value:function(){var e=this.options.columns;this.columnsByPin=ColumnsByPin(e),this.columnWidths=ColumnGroupWidths(this.columnsByPin,e)}},{key:"tableCss",value:function(){return{fixed:this.options.scrollbarV,selectable:this.options.selectable,checkboxable:this.options.checkboxSelection}}},{key:"adjustColumns",value:function(e){var t=this.options.internal.innerWidth-this.options.internal.scrollBarWidth;"force"===this.options.columnMode?ForceFillColumnWidths(this.options.columns,t,e):"flex"===this.options.columnMode&&AdjustColumnWidths(this.options.columns,t)}},{key:"calculatePageSize",value:function(){this.options.paging.size=Math.ceil(this.options.internal.bodyHeight/this.options.rowHeight)+1}},{key:"onSorted",value:function(){if(this.rows){var e=this.options.columns.filter(function(e){return e.sort}).sort(function(e,t){if(e.sortPriority&&t.sortPriority){if(e.sortPriority>t.sortPriority)return 1;if(e.sortPriority<t.sortPriority)return-1}else{if(e.sortPriority)return-1;if(t.sortPriority)return 1}return 0}).map(function(e,t){return e.sortPriority=t+1,e});if(e.length){this.onSort&&this.onSort({sorts:e}),this.options.onSort&&this.options.onSort(e);for(var t=[],n=0,o=e.length;n<o;n+=1){var i=e[n];if(!1!==i.comparator){var r="asc"===i.sort?"":"-";angular.isDefined(i.sortBy)?t.push(r+i.sortBy):t.push(r+i.prop)}}if(t.length){var l,s=this.$filter("orderBy")(this.rows,t);this.rows.splice(0,this.rows.length),(l=this.rows).push.apply(l,_toConsumableArray(s))}}this.options.internal&&this.options.internal.setYOffset&&this.options.internal.setYOffset(0)}}},{key:"onTreeToggled",value:function(e,t){this.onTreeToggle({row:e,cell:t})}},{key:"onBodyPage",value:function(e,t){this.onPage({offset:e,size:t})}},{key:"onFooterPage",value:function(e,t){var n=this.options.rowHeight*t,o=n*e;this.options.internal.setYOffset(o)}},{key:"selectAllRows",value:function(){var e;return this.selected.splice(0,this.selected.length),(e=this.selected).push.apply(e,_toConsumableArray(this.rows)),this.isAllRowsSelected()}},{key:"deselectAllRows",value:function(){return this.selected.splice(0,this.selected.length),this.isAllRowsSelected()}},{key:"isAllRowsSelected",value:function(){return!(!this.rows||!this.selected)&&this.selected.length===this.rows.length}},{key:"onResized",value:function(e,t){var n=this.options.columns.indexOf(e),o=e;n>-1&&(o=this.options.columns[n],e.width=t,e.canAutoResize=!1,this.adjustColumns(n),this.calculateColumns()),this.onColumnResize&&this.onColumnResize({column:o,width:t})}},{key:"onSelected",value:function(e){this.onSelect({rows:e})}},{key:"onRowClicked",value:function(e){this.onRowClick({row:e})}},{key:"onRowDblClicked",value:function(e){this.onRowDblClick({row:e})}}]),e}(),DataTableService={columns:{},dTables:{},saveColumns:function(e,t){if(t&&t.length){var n=[].slice.call(t);this.dTables[e]=n}},buildColumns:function(e,t){var n=this;angular.forEach(this.dTables,function(o,i){n.columns[i]=[],angular.forEach(o,function(o){var r={},l=!0;angular.forEach(o.attributes,function(n){var o=CamelCase(n.name);switch(o){case"class":r.className=n.value;break;case"name":case"prop":r[o]=n.value;break;case"headerRenderer":case"cellRenderer":case"cellDataGetter":r[o]=t(n.value);break;case"visible":l=t(n.value)(e);break;default:r[o]=t(n.value)(e)}});var s=o.getElementsByTagName("column-header");s.length&&(r.headerTemplate=s[0].innerHTML,o.removeChild(s[0])),""!==o.innerHTML&&(r.template=o.innerHTML),l&&n.columns[i].push(r)})}),this.dTables={}}},cache={},testStyle=document.createElement("div").style,prefix=function(){var e=window.getComputedStyle(document.documentElement,""),t=(Array.prototype.slice.call(e).join("").match(/-(moz|webkit|ms)-/)||""===e.OLink&&["","o"])[1];return{dom:"WebKit|Moz|MS|O".match(new RegExp("("+t+")","i"))[1],lowercase:t,css:"-"+t+"-",js:t[0].toUpperCase()+t.substr(1)}}(),ua=window.navigator.userAgent,transform=GetVendorPrefixedName("transform"),backfaceVisibility=GetVendorPrefixedName("backfaceVisibility"),hasCSSTransforms=!!GetVendorPrefixedName("transform"),hasCSS3DTransforms=!!GetVendorPrefixedName("perspective"),isSafari=/Safari\//.test(ua)&&!/Chrome\//.test(ua),HeaderController=function(){function e(){_classCallCheck(this,e)}return _createClass(e,[{key:"styles",value:function(){return{width:this.options.internal.innerWidth+"px",height:this.options.headerHeight+"px"}}},{key:"innerStyles",value:function(){return{width:this.columnWidths.total+"px"}}},{key:"onSorted",value:function(e,t){function n(t){t!==e&&(t.sort=void 0)}("single"===this.options.sortType&&(!this.options.modifierActive||!t)||"multiple"===this.options.sortType&&this.options.modifierActive&&t)&&(this.columns.left.forEach(n),this.columns.center.forEach(n),this.columns.right.forEach(n)),this.onSort({column:e})}},{key:"stylesByGroup",value:function(e){var t={width:this.columnWidths[e]+"px"};if("center"===e)TranslateXY(t,-1*this.options.internal.offsetX,0);else if("right"===e){var n=-1*(this.columnWidths.total-this.options.internal.innerWidth);TranslateXY(t,n,0)}return t}},{key:"onResized",value:function(e,t){this.onResize({column:e,width:t})}}]),e}(),HeaderCellController=function(){function e(t){_classCallCheck(this,e),_extends(this,{$scope:t}),isOldAngular()&&this.$onInit()}return e.$inject=["$scope"],_createClass(e,[{key:"$onInit",value:function(){this.init()}},{key:"init",value:function(){this.column.headerCheckbox&&(this.column.headerCheckboxCallback=this.rowSelected),this.$scope.$parent.$parent.$parent.$parent.dt&&(this.dt=this.$scope.$parent.$parent.$parent.$parent.dt)}},{key:"styles",value:function(){return{width:this.column.width+"px",minWidth:this.column.minWidth+"px",maxWidth:this.column.maxWidth+"px",height:this.column.height+"px"}}},{key:"cellClass",value:function(){var e={sortable:this.column.sortable,resizable:this.column.resizable};return this.column.headerClassName&&(e[this.column.headerClassName]=!0),e}},{key:"onSorted",value:function(e){this.column.sortable&&(this.column.sort=NextSortDirection(this.sortType,this.column.sort),angular.isUndefined(this.column.sort)&&(this.column.sortPriority=void 0),this.onSort({column:this.column,modifierPressed:e.shiftKey}))}},{key:"sortClass",value:function(){return{"sort-btn":!0,"sort-asc icon-down":"asc"===this.column.sort,"sort-desc icon-up":"desc"===this.column.sort}}},{key:"onResized",value:function(e,t){this.onResize({column:t,width:e})}},{key:"rowSelected",value:function(e){this.allRowsSelected=e.selected&&e.rows.length===e.selected.length}},{key:"checkboxChangeCallback",value:function(){return this.isAllRowsSelected=this.column.allRowsSelected,this.isAllRowsSelected?this.dt.selectAllRows():this.dt.deselectAllRows()}}]),e}(),TREE_TYPES={GROUP:"refreshGroups",TREE:"refreshTree"},BodyController=function(){function e(t){_classCallCheck(this,e),_extends(this,{$scope:t}),isOldAngular()&&this.$onInit()}return e.$inject=["$scope"],_createClass(e,[{key:"$onInit",value:function(){this.init()}},{key:"init",value:function(){var e=this;this.tempRows=[],this.watchListeners=[],this.setTreeAndGroupColumns(),this.setConditionalWatches(),this.$scope.$watch("body.options.columns",function(t){if(t){var n=angular.copy(e.treeColumn),o=angular.copy(e.groupColumn);e.setTreeAndGroupColumns(),e.setConditionalWatches(),(e.treeColumn&&n!==e.treeColumn||e.groupColumn&&o!==e.groupColumn)&&(e.rowsUpdated(e.rows),e.treeColumn?e.refreshTree():e.groupColumn&&e.refreshGroups())}},!0),this.$scope.$watchCollection("body.rows",this.rowsUpdated.bind(this))}},{key:"setTreeAndGroupColumns",value:function(){this.options&&this.options.columns&&(this.treeColumn=this.options.columns.find(function(e){return e.isTreeColumn}),this.treeColumn?this.groupColumn=void 0:this.groupColumn=this.options.columns.find(function(e){return e.group}))}},{key:"buildInternalPage",value:function(){var e=void 0,t=void 0;for(this.tempRows.splice(0,this.tempRows.length),e=0;e<this.options.paging.size;e+=1)t=this.options.paging.offset*this.options.paging.size+e,angular.isDefined(this.rows[t])&&(this.tempRows[e]=this.rows[t])}},{key:"setConditionalWatches",value:function(){for(var e=this,t=this.watchListeners.length-1;t>=0;t-=1)this.watchListeners[t](),this.watchListeners.splice(t,1);if(this.options&&(this.options.scrollbarV||!this.options.scrollbarV&&this.options.paging&&this.options.paging.size)){var n=!1;this.watchListeners.push(this.$scope.$watch("body.options.paging.size",function(t,o){(!n||t>o)&&(e.getRows(),n=!0)})),this.watchListeners.push(this.$scope.$watch("body.options.paging.count",function(t){e.count=t,e.updatePage()})),this.watchListeners.push(this.$scope.$watch("body.options.paging.offset",function(t){e.options.paging.size&&("internal"===e.options.paging.mode&&e.buildInternalPage(),e.onPage&&e.onPage({offset:t,size:e.options.paging.size}))}))}}},{key:"rowsUpdated",value:function(e,t){if(e)if("external"!==this.options.paging.mode&&(this.options.paging.count=e.length),this.count=this.options.paging.count,(this.treeColumn||this.groupColumn)&&this.buildRowsByGroup(),this.options.scrollbarV){var n=e&&t&&(e.length===t.length||e.length<t.length);this.getRows(n)}else{var o=this.rows;if(this.treeColumn?o=this.buildTree():this.groupColumn&&(o=this.buildGroups()),"external"===this.options.paging.mode){var i=this.getFirstLastIndexes(),r=i.first;for(this.tempRows.splice(0,this.tempRows.length);r<i.last;)this.tempRows.push(o[r+=1])}else if("internal"===this.options.paging.mode)this.buildInternalPage();else{var l;this.tempRows.splice(0,this.tempRows.length),(l=this.tempRows).push.apply(l,_toConsumableArray(o))}}else this.getRows(!0)}},{key:"getFirstLastIndexes",value:function(){var e=void 0,t=void 0;return this.options.scrollbarV?(e=Math.max(Math.floor((this.options.internal.offsetY||0)/this.options.rowHeight,0),0),t=Math.min(e+this.options.paging.size,this.count)):"external"===this.options.paging.mode?(e=Math.max(this.options.paging.offset*this.options.paging.size,0),t=Math.min(e+this.options.paging.size,this.count)):t=this.count,{first:e,last:t}}},{key:"updatePage",value:function(){var e=this.options.paging.offset,t=this.getFirstLastIndexes();angular.isUndefined(this.options.internal.oldScrollPosition)&&(this.options.internal.oldScrollPosition=0);var n=this.options.internal.oldScrollPosition,o=t.first/this.options.paging.size;this.options.internal.oldScrollPosition=o,o=o<n?Math.floor(o):o>n?Math.ceil(o):e,isNaN(o)||(this.options.paging.offset=o)}},{key:"calculateDepth",value:function(e){var t=arguments.length>1&&void 0!==arguments[1]?arguments[1]:0,n=this.treeColumn?this.treeColumn.relationProp:this.groupColumn.prop,o=this.treeColumn.prop;if(!e[n])return t;if(e.$$depth)return e.$$depth+t;var i=this.index[e[n]];if(i)return t+=1,this.calculateDepth(i,t);for(var r=0,l=this.rows.length;r<l;r+=1){var s=this.rows[r];if(s[o]===e[n])return t+=1,this.calculateDepth(s,t)}return t}},{key:"buildRowsByGroup",value:function(){this.index={},this.rowsByGroup={};for(var e=this.treeColumn?this.treeColumn.relationProp:this.groupColumn.prop,t=0,n=this.rows.length;t<n;t+=1){var o=this.rows[t],i=o[e];if(i&&(this.rowsByGroup[i]?this.rowsByGroup[i].push(o):this.rowsByGroup[i]=[o]),this.treeColumn){var r=this.treeColumn.prop;if(this.index[o[r]]=o,angular.isUndefined(o[e]))o.$$depth=0;else{var l=this.index[o[e]];if(angular.isUndefined(l))for(var s=0;s<n;s+=1)if(this.rows[s][r]===i){l=this.rows[s];break}angular.isUndefined(l.$$depth)&&(l.$$depth=this.calculateDepth(l)),o.$$depth=l.$$depth+1,l.$$children?l.$$children.push(o[r]):l.$$children=[o[r]]}}}}},{key:"buildGroups",value:function(){var e=this,t=[];return angular.forEach(this.rowsByGroup,function(n,o){t.push({name:o,group:!0}),e.expanded[o]&&t.push.apply(t,_toConsumableArray(n))}),t}},{key:"isSelected",value:function(e){var t=!1;return this.options.selectable&&(t=this.options.multiSelect?this.selected.indexOf(e)>-1:this.selected===e),t}},{key:"buildTree",value:function(){var e=[],t=this;return function e(n,o,i){n.forEach(function(n){var r=n[t.treeColumn.relationProp],l=n[t.treeColumn.prop],s=t.rowsByGroup[l],a=t.expanded[l];(i>0||!r)&&(o.push(n),s&&s.length>0&&a&&e(s,o,i+1))})}(this.rows,e,0),e}},{key:"getRows",value:function(e){if((this.treeColumn||this.groupColumn)&&!this.rowsByGroup)return!1;var t=void 0;this.treeColumn?(t=this.treeTemp||[],!e&&this.treeTemp||(t=this.buildTree(),this.treeTemp=t,this.count=t.length,this.tempRows.splice(0,this.tempRows.length))):this.groupColumn?(t=this.groupsTemp||[],!e&&this.groupsTemp||(t=this.buildGroups(),this.groupsTemp=t,this.count=t.length)):(t=this.rows,!0===e&&this.tempRows.splice(0,this.tempRows.length));var n=0,o=this.getFirstLastIndexes(),i=o.first;for(this.tempRows.splice(0,o.last-o.first);i<o.last&&i<this.count;){var r=t[i];r&&(r.$$index=i,this.tempRows[n]=r),n+=1,i+=1}return this.options.internal&&this.options.internal.styleTranslator&&this.options.internal.styleTranslator.update(this.tempRows),this.tempRows}},{key:"styles",value:function(){var e={width:this.options.internal.innerWidth+"px"};return this.options.scrollbarV?!1===this.options.scrollbarH&&(e.overflowX="hidden"):e.overflowY="hidden",this.options.scrollbarV&&(e.height=this.options.internal.bodyHeight+"px"),e}},{key:"rowStyles",value:function(){var e={};return"auto"===this.options.rowHeight&&(e.height=this.options.rowHeight+"px"),e}},{key:"groupRowStyles",value:function(e){var t=this.rowStyles(e);return t.width=this.columnWidths.total+"px",t}},{key:"rowClasses",value:function(e){var t={selected:this.isSelected(e),"dt-row-even":e&&e.$$index%2==0,"dt-row-odd":e&&e.$$index%2!=0};return this.treeColumn&&(t["dt-leaf"]=this.rowsByGroup[e[this.treeColumn.relationProp]],t["dt-has-leafs"]=this.rowsByGroup[e[this.treeColumn.prop]],t["dt-depth-"+e.$$depth]=!0),t}},{key:"getRowValue",value:function(e){return this.tempRows[e]}},{key:"getRowExpanded",value:function(e){return this.treeColumn?this.expanded[e[this.treeColumn.prop]]:this.groupColumn?this.expanded[e.name]:void 0}},{key:"refresh",value:function(e){if(this.options.scrollbarV)this.getRows(!0);else{var t,n=this[e]();this.tempRows.splice(0,this.tempRows.length),(t=this.tempRows).push.apply(t,_toConsumableArray(n))}}},{key:"getRowHasChildren",value:function(e){if(this.treeColumn){var t=this.rowsByGroup[e[this.treeColumn.prop]];return angular.isDefined(t)||t&&!t.length}}},{key:"refreshTree",value:function(){this.refresh(TREE_TYPES.TREE)}},{key:"onTreeToggled",value:function(e,t){var n=e[this.treeColumn.prop];this.expanded[n]=!this.expanded[n],this.refreshTree(),this.onTreeToggle({row:e,cell:t})}},{key:"refreshGroups",value:function(){this.refresh(TREE_TYPES.GROUP)}},{key:"onGroupToggle",value:function(e){this.expanded[e.name]=!this.expanded[e.name],this.refreshGroups()}}]),e}(),StyleTranslator=function(){function e(t){_classCallCheck(this,e),this.height=t,this.map=new Map}return _createClass(e,[{key:"update",value:function(e){for(var t=0;t<=this.map.size;){var n=this.map.get(t),o=e[t];n&&o&&TranslateXY(n[0].style,0,o.$$index*this.height),t+=1}}},{key:"register",value:function(e,t){this.map.set(e,t)}}]),e}(),KEYS={BACKSPACE:8,TAB:9,RETURN:13,ALT:18,ESC:27,SPACE:32,PAGE_UP:33,PAGE_DOWN:34,END:35,HOME:36,LEFT:37,UP:38,RIGHT:39,DOWN:40,DELETE:46,COMMA:188,PERIOD:190,A:65,Z:90,ZERO:48,NUMPAD_0:96,NUMPAD_9:105},SelectionController=function(){function e(t){_classCallCheck(this,e),this.body=t.body,this.options=t.body.options,this.selected=t.body.selected}return e.$inject=["$scope"],_createClass(e,[{key:"keyDown",value:function(e,t,n){if(KEYS[e.keyCode]&&e.preventDefault(),e.keyCode===KEYS.DOWN){var o=e.target.nextElementSibling;o&&o.focus()}else if(e.keyCode===KEYS.UP){var i=e.target.previousElementSibling;i&&i.focus()}else e.keyCode===KEYS.RETURN&&this.selectRow(t,n)}},{key:"rowClicked",value:function(e,t,n){this.options.checkboxSelection||this.selectRow(e,t,n),this.body.onRowClick({row:n})}},{key:"rowDblClicked",value:function(e,t,n){this.options.checkboxSelection||(e.preventDefault(),this.selectRow(e,t,n)),this.body.onRowDblClick({row:n})}},{key:"onCheckboxChange",value:function(e,t,n){this.selectRow(e,t,n)}},{key:"selectRow",value:function(e,t,n){if(this.options.selectable)if(this.options.multiSelect){var o=e.shiftKey;if(o)this.selectRowsBetween(t,n);else{var i=this.selected.indexOf(n);i>-1?this.selected.splice(i,1):(this.options.multiSelectOnShift&&1===this.selected.length&&this.selected.splice(0,1),this.selected.push(n),this.body.onSelect({rows:[n]}))}this.prevIndex=t}else this.selected=n,this.body.onSelect({rows:[n]})}},{key:"selectRowsBetween",value:function(e){for(var t=e<this.prevIndex,n=[],o=0,i=this.body.rows.length;o<i;o+=1){var r=this.body.rows[o],l=o>=this.prevIndex&&o<=e,s=o<=this.prevIndex&&o>=e,a={};if(a=t?{start:e,end:this.prevIndex-e}:{start:this.prevIndex,end:e+1},t&&s||!t&&l){var c=this.selected.indexOf(r);t&&c>-1?this.selected.splice(c,1):o>=a.start&&o<a.end&&-1===c&&(this.selected.push(r),n.push(r))}this.body.onSelect({rows:n})}}}]),e}(),RowController=function(){function e(){_classCallCheck(this,e)}return _createClass(e,[{key:"getValue",value:function(e){return e.prop?DeepValueGetter(this.row,e.prop):""}},{key:"onTreeToggled",value:function(e){this.onTreeToggle({cell:e,row:this.row})}},{key:"stylesByGroup",value:function(e){var t={width:this.columnWidths[e]+"px"};if("left"===e)TranslateXY(t,this.options.internal.offsetX,0);else if("right"===e){var n=-1*(this.columnWidths.total-this.options.internal.innerWidth-this.options.internal.offsetX+this.options.internal.scrollBarWidth);TranslateXY(t,n,0)}return t}},{key:"onCheckboxChanged",value:function(e){this.onCheckboxChange({$event:e,row:this.row})}}]),e}(),GroupRowController=function(){function e(){_classCallCheck(this,e)}return _createClass(e,[{key:"onGroupToggled",value:function(e){e.stopPropagation(),this.onGroupToggle({group:this.row})}},{key:"treeClass",value:function(){return{"dt-tree-toggle":!0,"icon-right":!this.expanded,"icon-down":this.expanded}}}]),e}(),CellController=function(){function e(){_classCallCheck(this,e)}return _createClass(e,[{key:"styles",value:function(){return{width:this.column.width+"px","min-width":this.column.width+"px"}}},{key:"cellClass",value:function(){var e={"dt-tree-col":this.column.isTreeColumn};return this.column.className&&(e[this.column.className]=!0),e}},{key:"treeClass",value:function(){return{"dt-tree-toggle":!0,"icon-right":!this.expanded,"icon-down":this.expanded}}},{key:"onTreeToggled",value:function(e){e.stopPropagation(),this.expanded=!this.expanded,this.onTreeToggle({cell:{value:this.value,column:this.column,expanded:this.expanded}})}},{key:"onCheckboxChanged",value:function(e){e.stopPropagation(),this.onCheckboxChange({$event:e})}},{key:"getValue",value:function(){var e=this.column.cellDataGetter?this.column.cellDataGetter(this.value):this.value;return(angular.isUndefined(e)||null===e)&&(e=""),e}}]),e}(),FooterController=function(){function e(t){_classCallCheck(this,e),_extends(this,{$scope:t}),isOldAngular()&&this.$onInit()}return e.$inject=["$scope"],_createClass(e,[{key:"$onInit",value:function(){this.init()}},{key:"init",value:function(){var e=this;this.page=this.paging.offset+1,this.$scope.$watch("footer.paging.offset",function(t){e.offsetChanged(t)})}},{key:"offsetChanged",value:function(e){this.page=e+1}},{key:"onPaged",value:function(e){this.paging.offset=e-1,this.onPage({offset:this.paging.offset,size:this.paging.size})}}]),e}(),PagerController=function(){function e(t){_classCallCheck(this,e),_extends(this,{$scope:t}),isOldAngular()&&this.$onInit()}return e.$inject=["$scope"],_createClass(e,[{key:"$onInit",value:function(){this.init()}},{key:"init",value:function(){var e=this;this.$scope.$watch("pager.count",function(){e.findAndSetPages()}),this.$scope.$watch("pager.size",function(){e.findAndSetPages()}),this.$scope.$watch("pager.page",function(t){0!==t&&t<=e.totalPages&&e.getPages(t)}),this.size&&this.count&&this.page&&this.findAndSetPages()}},{key:"findAndSetPages",value:function(){this.calcTotalPages(this.size,this.count),this.getPages(this.page||1)}},{key:"calcTotalPages",value:function(e,t){var n=e<1?1:Math.ceil(t/e);this.totalPages=Math.max(n||0,1)}},{key:"selectPage",value:function(e){e>0&&e<=this.totalPages&&(this.page=e,this.onPage({page:e}))}},{key:"prevPage",value:function(){this.canPrevious()&&this.selectPage(this.page-=1)}},{key:"nextPage",value:function(){this.canNext()&&this.selectPage(this.page+=1)}},{key:"canPrevious",value:function(){return this.page>1}},{key:"canNext",value:function(){return this.page<this.totalPages}},{key:"getPages",value:function(e){var t=[],n=5<this.totalPages,o=1,i=this.totalPages;n&&(o=5*(Math.ceil(e/5)-1)+1,i=Math.min(o+5-1,this.totalPages));for(var r=o;r<=i;r+=1)t.push({number:r,text:r,active:r===e});this.pages=t}}]),e}(),POSITION={LEFT:"left",RIGHT:"right",TOP:"top",BOTTOM:"bottom",CENTER:"center",MIDDLE:"middle"},popover=angular.module("dt.popover",[]).factory("PopoverRegistry",PopoverRegistry).factory("PositionHelper",PositionHelper).directive("popover",PopoverDirective),MenuController=function(){function e(t){_classCallCheck(this,e),this.$scope=t}return e.$inject=["$scope"],_createClass(e,[{key:"getColumnIndex",value:function(e){return this.$scope.current.findIndex(function(t){return e.name===t.name})}},{key:"isChecked",value:function(e){return this.getColumnIndex(e)>-1}},{key:"onCheck",value:function(e){var t=this.getColumnIndex(e);-1===t?this.$scope.current.push(e):this.$scope.current.splice(t,1)}}]),e}(),DropdownController=function(){function e(t){_classCallCheck(this,e),_extends(this,{$scope:t}),t.open=!1}return e.$inject=["$scope"],_createClass(e,[{key:"toggle",value:function(){this.$scope.open=!this.$scope.open}}]),e}(),dropdown=angular.module("dt.dropdown",[]).controller("DropdownController",DropdownController).directive("dropdown",DropdownDirective).directive("dropdownToggle",DropdownToggleDirective).directive("dropdownMenu",DropdownMenuDirective),menu=angular.module("dt.menu",[dropdown.name]).controller("MenuController",MenuController).directive("dtm",MenuDirective),dataTable=angular.module("data-table",[]).directive("dtable",DataTableDirective).directive("resizable",ResizableDirective).directive("sortable",SortableDirective).directive("dtHeader",HeaderDirective).directive("dtHeaderCell",HeaderCellDirective).directive("dtBody",BodyDirective).directive("dtScroller",ScrollerDirective).directive("dtSelection",SelectionDirective).directive("dtRow",RowDirective).directive("dtGroupRow",GroupRowDirective).directive("dtCell",CellDirective).directive("dtFooter",FooterDirective).directive("dtPager",PagerDirective);exports.dtPopover=popover,exports.dtMenu=menu,exports.default=dataTable;
+'use strict';
+
+PositionHelper.$inject = ["$log"];
+PopoverDirective.$inject = ["$animate", "$compile", "$document", "$http", "$q", "$templateCache", "$timeout", "PopoverRegistry", "PositionHelper"];
+DropdownDirective.$inject = ["$document", "$timeout"];
+DropdownToggleDirective.$inject = ["$timeout"];
+DropdownMenuDirective.$inject = ["$animate"];
+DataTableDirective.$inject = ["$window", "$timeout", "$parse"];
+ResizableDirective.$inject = ["$document", "$timeout"];
+HeaderDirective.$inject = ["$timeout"];
+HeaderCellDirective.$inject = ["$compile"];
+CellDirective.$inject = ["$rootScope", "$compile"];
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+/* eslint-disable no-extend-native, no-bitwise */
+
+(function extendArray() {
+  /**
+   * Array.prototype.find()
+   * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/find
+   */
+  if (!Array.prototype.find) {
+    Object.defineProperty(Array.prototype, 'find', {
+      value: function value(predicate, thisArg) {
+        if (this == null) {
+          throw new TypeError('Array.prototype.find called on null or undefined');
+        }
+
+        if (!angular.isFunction(predicate)) {
+          throw new TypeError('predicate must be a function');
+        }
+
+        var list = Object(this);
+        var length = list.length >>> 0;
+
+        var value = void 0;
+
+        for (var i = 0; i < length; i += 1) {
+          value = list[i];
+          if (predicate.call(thisArg, value, i, list)) {
+            return value;
+          }
+        }
+
+        return undefined;
+      }
+    });
+  }
+
+  /**
+   * Array.prototype.findIndex()
+   * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/findIndex
+   */
+  if (!Array.prototype.findIndex) {
+    Object.defineProperty(Array.prototype, 'findIndex', {
+      value: function value(predicate, thisArg) {
+        if (this == null) {
+          throw new TypeError('Array.prototype.findIndex called on null or undefined');
+        }
+
+        if (!angular.isFunction(predicate)) {
+          throw new TypeError('predicate must be a function');
+        }
+
+        var list = Object(this);
+        var length = list.length >>> 0;
+
+        var value = void 0;
+
+        for (var i = 0; i < length; i += 1) {
+          value = list[i];
+          if (predicate.call(thisArg, value, i, list)) {
+            return i;
+          }
+        }
+        return -1;
+      },
+
+      enumerable: false,
+      configurable: false,
+      writable: false
+    });
+  }
+})();
+
+/**
+ * Resizable directive
+ * http://stackoverflow.com/questions/18368485/angular-js-resizable-div-directive
+ * @param {object}
+ * @param {function}
+ * @param {function}
+ */
+function ResizableDirective($document, $timeout) {
+  return {
+    restrict: 'A',
+    scope: {
+      isResizable: '=resizable',
+      minWidth: '=',
+      maxWidth: '=',
+      onResize: '&'
+    },
+    link: function link($scope, $element) {
+      if ($scope.isResizable) {
+        $element.addClass('resizable');
+      }
+
+      var handle = angular.element('<span class="dt-resize-handle" title="Resize"></span>');
+      var parent = $element.parent();
+
+      var prevScreenX = void 0;
+
+      handle.on('mousedown', function (event) {
+        if (!$element[0].classList.contains('resizable')) {
+          return;
+        }
+
+        event.stopPropagation();
+        event.preventDefault();
+
+        $document.on('mousemove', mousemove);
+        $document.on('mouseup', mouseup);
+      });
+
+      function mousemove(event) {
+        event = event.originalEvent || event;
+
+        var width = parent[0].clientWidth;
+        var movementX = event.movementX || event.mozMovementX || event.screenX - prevScreenX;
+        var newWidth = width + (movementX || 0);
+
+        prevScreenX = event.screenX;
+
+        if ((!$scope.minWidth || newWidth >= $scope.minWidth) && (!$scope.maxWidth || newWidth <= $scope.maxWidth)) {
+          parent.css({
+            width: newWidth + 'px'
+          });
+        }
+      }
+
+      function mouseup() {
+        if ($scope.onResize) {
+          $timeout(function () {
+            var width = parent[0].clientWidth;
+            if (width < $scope.minWidth) {
+              width = $scope.minWidth;
+            }
+            $scope.onResize({ width: width });
+          });
+        }
+
+        $document.unbind('mousemove', mousemove);
+        $document.unbind('mouseup', mouseup);
+      }
+
+      $element.append(handle);
+    }
+  };
+}
+
+/**
+ * Sortable Directive
+ * http://jsfiddle.net/RubaXa/zLq5J/3/
+ * https://jsfiddle.net/hrohxze0/6/
+ * @param {function}
+ */
+function SortableDirective() {
+  return {
+    restrict: 'A',
+    scope: {
+      isSortable: '=sortable',
+      onSortableSort: '&'
+    },
+    link: function link($scope, $element) {
+      var dragEl = void 0;
+      var nextEl = void 0;
+
+      function isbefore(a, b) {
+        if (a.parentNode === b.parentNode) {
+          for (var cur = a; cur; cur = cur.previousSibling) {
+            if (cur === b) {
+              return true;
+            }
+          }
+        }
+        return false;
+      }
+
+      function onDragEnter(e) {
+        var target = e.target;
+        if (isbefore(dragEl, target)) {
+          target.parentNode.insertBefore(dragEl, target);
+        } else if (target.nextSibling && target.hasAttribute('draggable')) {
+          target.parentNode.insertBefore(dragEl, target.nextSibling.nextSibling);
+        }
+      }
+
+      function onDragEnd(evt) {
+        evt.preventDefault();
+
+        dragEl.classList.remove('dt-clone');
+
+        $element.off('dragend', onDragEnd);
+        $element.off('dragenter', onDragEnter);
+
+        if (nextEl !== dragEl.nextSibling) {
+          $scope.onSortableSort({
+            event: evt,
+            columnId: angular.element(dragEl).attr('data-id')
+          });
+        }
+      }
+
+      function onDragStart(evt) {
+        if (!$scope.isSortable) return;
+
+        evt = evt.originalEvent || evt;
+
+        dragEl = evt.target;
+        nextEl = dragEl.nextSibling;
+        dragEl.classList.add('dt-clone');
+
+        evt.dataTransfer.effectAllowed = 'move';
+        evt.dataTransfer.setData('Text', dragEl.textContent);
+
+        $element.on('dragenter', onDragEnter);
+        $element.on('dragend', onDragEnd);
+      }
+
+      $element.on('dragstart', onDragStart);
+
+      $scope.$on('$destroy', function () {
+        $element.off('dragstart', onDragStart);
+      });
+    }
+  };
+}
+
+/**
+ * Default Table Options
+ * @type {object}
+ */
+var TableDefaults = {
+
+  /**
+   * Checkbox selection (true) vs. row click (false)
+   * @type {boolean}
+   */
+  checkboxSelection: false,
+
+  /**
+   * Options: 'flex', 'force', 'standard'
+   * @type {string}
+   */
+  columnMode: 'standard',
+
+  /**
+   * Message to show when array is presented
+   * but contains no values
+   * @type {string}
+   */
+  emptyMessage: 'No data to display',
+
+  /**
+   * The minimum footer height in pixels.
+   * pass falsey for no footer
+   * @type {number}
+   */
+  footerHeight: 0,
+
+  /**
+   * The minimum header height in pixels.
+   * pass falsey for no header
+   * @type {number}
+   */
+  headerHeight: 30,
+
+  /**
+   * Internal options
+   * @type {Object}
+   */
+  internal: {
+    offsetX: 0,
+    offsetY: 0,
+    innerWidth: 0,
+    bodyHeight: 300
+  },
+
+  /**
+   * Loading indicator
+   * @type {boolean}
+   */
+  loadingIndicator: false,
+
+  /**
+   *Loading message presented when the array is undefined
+   * @type {boolean}
+   */
+  loadingMessage: 'Loading...',
+
+  /**
+   * Whether multiple rows can be selected at once.
+   * @type {boolean}
+   */
+  multiSelect: false,
+
+  /**
+   * The default paging Options
+   * @type {Object}
+   */
+  paging: {
+    /**
+     * Total count
+     * @type {number}
+     */
+    count: 0,
+
+    /**
+     * Page offset
+     * @type {number}
+     */
+    offset: 0,
+
+    /**
+     * The paging mode to use: 'internal', 'external', null (none)
+     * @type: {string}
+     */
+    mode: null,
+
+    /**
+     * Page size
+     * @type {number}
+     */
+    size: 10
+  },
+
+  /**
+   * Whether columns can be reordered.
+   * @type {boolean}
+   */
+  reorderable: true,
+
+  /**
+   * The row height, which is necessary to calculate
+   * the height for the lazy rendering.
+   * @type {number}
+   */
+  rowHeight: 30,
+
+  /**
+   * Enable vertical scrollbars
+   * @type {boolean}
+   */
+  scrollbarV: true,
+
+  /**
+   * Whether rows are selectable.
+   * @type {boolean}
+   */
+  selectable: false,
+
+  // If yes then columns can be sorted.
+  sortable: true,
+
+  // sorting by single or multiple columns
+  /**
+   * Whether sorting can be done on single or multiple columns.
+   * @type {string}
+   */
+  sortType: 'multiple',
+
+  /**
+   * Whether sorting modifier key is active.
+   * @type {boolean}
+   */
+  modifierActive: true
+};
+
+/**
+ * Default Column Options
+ * @type {object}
+ */
+var ColumnDefaults = {
+
+  /**
+   * Whether the column can automatically resize to fill space in the table.
+   * @type {boolean}
+   */
+  canAutoResize: true,
+
+  /**
+   * The getter function(value) that returns the cell data for the cellRenderer.
+   * If not provided, the cell data will be collected from row data instead.
+   * @type {function}
+   */
+  cellDataGetter: undefined,
+
+  /**
+   * The cell renderer function(scope, elm) that returns React-renderable content for table cell.
+   * @type {function}
+   */
+  cellRenderer: undefined,
+
+  /**
+   * body cell css class name
+   * @type {string}
+   */
+  className: undefined,
+
+  /**
+   * Custom sort comparator
+   * pass false if you want to server sort
+   * @type {function|boolean}
+   */
+  comparator: undefined,
+
+  /**
+   * The grow factor relative to other columns. Same as the flex-grow
+   * API from http://www.w3.org/TR/css3-flexbox/. Basically,
+   * take any available extra width and distribute it proportionally
+   * according to all columns' flexGrow values.
+   * @type {number}
+   */
+  flexGrow: 0,
+
+  /**
+   * Pinned to the left
+   * @type {boolean}
+   */
+  frozenLeft: false,
+
+  /**
+   * Pinned to the right
+   * @type {boolean}
+   */
+  frozenRight: false,
+
+  /**
+   * Grows all rows by this column value
+   * Only one column can have this set, cannot be combined with isTreeColumn
+   * @type {boolean}
+   */
+  group: false,
+
+  /**
+   * Toggles the checkbox column in the header
+   * for selecting all values given to the grid
+   * @type {boolean}
+   */
+  headerCheckbox: false,
+
+  /**
+   * header cell css class name
+   * @type {string}
+   */
+  headerClassName: undefined,
+
+  /**
+   * The cell renderer that returns content for table column header
+   * @type {function}
+   */
+  headerRenderer: undefined,
+
+  /**
+   * Adds the checkbox selection to the column
+   * @type {boolean}
+   */
+  isCheckboxColumn: false,
+
+  /**
+   * Adds +/- button and makes a secondary call to load nested data
+   * Only one column can have this set, cannot be combined with isGroupColumn
+   * @type {boolean}
+   */
+  isTreeColumn: false,
+
+  /**
+   * Maximum width of the column.
+   * @type {number}
+   */
+  maxWidth: undefined,
+
+  /**
+   * Minimum width of the column.
+   * @type {number}
+   */
+  minWidth: 100,
+
+  /**
+   * If yes then the column can be resized, otherwise it cannot.
+   * @type {boolean}
+   */
+  resizable: true,
+
+  /**
+   * Default sort ('asc' or 'desc') for the column
+   * @type {string}
+   */
+  sort: undefined,
+
+  /**
+   * If yes then the column can be sorted.
+   * @type {boolean}
+   */
+  sortable: true,
+
+  /**
+   * If you want to sort a column by a special property
+   * See an example in demos/sort.html
+   * @type {string}
+   */
+  sortBy: undefined,
+
+  /**
+   * The width of the column, by default (in pixels).
+   * @type {number}
+   */
+  width: 150
+};
+
+/**
+ * Shim layer with setTimeout fallback
+ * http://www.html5rocks.com/en/tutorials/speed/animations/
+ */
+var requestAnimFrame = function getRequestAnimFrame() {
+  return window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame || function callCallback(callback) {
+    window.setTimeout(callback, 1000 / 60);
+  };
+}();
+
+/**
+ * Creates a unique object id.
+ */
+function ObjectId() {
+  var timestamp = Math.floor(new Date().getTime() / 1000).toString(16);
+
+  return timestamp + 'xxxxxxxxxxxxxxxx'.replace(/[x]/g, function () {
+    return Math.floor(Math.random() * 16).toString(16);
+  }).toLowerCase();
+}
+
+/**
+ * Returns the columns by pin.
+ * @param {array} colsumns
+ */
+function ColumnsByPin(cols) {
+  var ret = {
+    left: [],
+    center: [],
+    right: []
+  };
+
+  for (var i = 0, len = cols.length; i < len; i += 1) {
+    var c = cols[i];
+    if (c.frozenLeft) {
+      ret.left.push(c);
+    } else if (c.frozenRight) {
+      ret.right.push(c);
+    } else {
+      ret.center.push(c);
+    }
+  }
+
+  return ret;
+}
+
+/**
+ * Returns the widths of all group sets of a column
+ * @param {object} groups
+ * @param {array} all
+ */
+function ColumnGroupWidths(groups, all) {
+  return {
+    left: ColumnTotalWidth(groups.left),
+    center: ColumnTotalWidth(groups.center),
+    right: ColumnTotalWidth(groups.right),
+    total: ColumnTotalWidth(all)
+  };
+}
+
+/**
+ * Returns a deep object given a string. zoo['animal.type']
+ * @param {object} obj
+ * @param {string} path
+ */
+function DeepValueGetter(obj, path) {
+  if (!obj || !path) return obj;
+
+  var split = path.split('.');
+
+  var current = obj;
+
+  if (split.length) {
+    for (var i = 0, len = split.length; i < len; i += 1) {
+      current = current[split[i]];
+    }
+  }
+
+  return current;
+}
+
+/**
+ * Converts strings from something to camel case
+ * http://stackoverflow.com/questions/10425287/convert-dash-separated-string-to-camelcase
+ * @param  {string} str
+ * @return {string} camel case string
+ */
+function CamelCase(str) {
+  // Replace special characters with a space
+  str = str.replace(/[^a-zA-Z0-9 ]/g, ' ');
+  // put a space before an uppercase letter
+  str = str.replace(/([a-z](?=[A-Z]))/g, '$1 ');
+  // Lower case first character and some other stuff
+  str = str.replace(/([^a-zA-Z0-9 ])|^[0-9]+/g, '').trim().toLowerCase();
+  // uppercase characters preceded by a space or number
+  str = str.replace(/([ 0-9]+)([a-zA-Z])/g, function (a, b, c) {
+    return b.trim() + c.toUpperCase();
+  });
+  return str;
+}
+
+/**
+ * Gets the width of the scrollbar.  Nesc for windows
+ * http://stackoverflow.com/a/13382873/888165
+ * @return {int} width
+ */
+function ScrollbarWidth() {
+  var outer = document.createElement('div');
+  outer.style.visibility = 'hidden';
+  outer.style.width = '100px';
+  outer.style.msOverflowStyle = 'scrollbar';
+  document.body.appendChild(outer);
+
+  var widthNoScroll = outer.offsetWidth;
+  outer.style.overflow = 'scroll';
+
+  var inner = document.createElement('div');
+  inner.style.width = '100%';
+  outer.appendChild(inner);
+
+  var widthWithScroll = inner.offsetWidth;
+  outer.parentNode.removeChild(outer);
+
+  return widthNoScroll - widthWithScroll;
+}
+
+function NextSortDirection(sortType, currentSort) {
+  if (sortType === 'single') {
+    if (currentSort === 'asc') {
+      return 'desc';
+    }
+
+    return 'asc';
+  } else if (!currentSort) {
+    return 'asc';
+  } else if (currentSort === 'asc') {
+    return 'desc';
+  } else if (currentSort === 'desc') {
+    return undefined;
+  }
+}
+
+// Old angular versions being where preAssignBindingsEnabled === true and no $onInit
+function isOldAngular() {
+  return angular.version.major === 1 && angular.version.minor < 5;
+}
+
+/**
+ * Calculates the total width of all columns and their groups
+ * @param {array} columns
+ * @param {string} property width to get
+ */
+function ColumnTotalWidth(columns, prop) {
+  var totalWidth = 0;
+
+  columns.forEach(function (c) {
+    var has = prop && c[prop];
+    totalWidth += has ? c[prop] : c.width;
+  });
+
+  return totalWidth;
+}
+
+/**
+ * Calculates the Total Flex Grow
+ * @param {array}
+ */
+function GetTotalFlexGrow(columns) {
+  var totalFlexGrow = 0;
+
+  columns.forEach(function (c) {
+    totalFlexGrow += c.flexGrow || 0;
+  });
+
+  return totalFlexGrow;
+}
+
+/**
+ * Adjusts the column widths.
+ * Inspired by: https://github.com/facebook/fixed-data-table/blob/master/src/FixedDataTableWidthHelper.js
+ * @param {array} all columns
+ * @param {int} width
+ */
+function AdjustColumnWidths(allColumns, expectedWidth) {
+  var columnsWidth = ColumnTotalWidth(allColumns);
+  var totalFlexGrow = GetTotalFlexGrow(allColumns);
+  var colsByGroup = ColumnsByPin(allColumns);
+
+  if (columnsWidth !== expectedWidth) {
+    ScaleColumns(colsByGroup, expectedWidth, totalFlexGrow);
+  }
+}
+
+/**
+ * Resizes columns based on the flexGrow property, while respecting manually set widths
+ * @param {array} colsByGroup
+ * @param {int} maxWidth
+ * @param {int} totalFlexGrow
+ */
+function ScaleColumns(colsByGroup, maxWidth, totalFlexGrow) {
+  // calculate total width and flexgrow points for coulumns that can be resized
+  angular.forEach(colsByGroup, function (cols) {
+    cols.forEach(function (column) {
+      if (!column.canAutoResize) {
+        maxWidth -= column.width;
+        totalFlexGrow -= column.flexGrow;
+      } else {
+        column.width = 0;
+      }
+    });
+  });
+
+  var hasMinWidth = {};
+  var remainingWidth = maxWidth;
+
+  function colsForEach(cols, widthPerFlexPoint) {
+    cols.forEach(function (column, i) {
+      // if the column can be resize and it hasn't reached its minimum width yet
+      if (column.canAutoResize && !hasMinWidth[i]) {
+        var newWidth = column.width + column.flexGrow * widthPerFlexPoint;
+        if (angular.isDefined(column.minWidth) && newWidth < column.minWidth) {
+          remainingWidth += newWidth - column.minWidth;
+          column.width = column.minWidth;
+          hasMinWidth[i] = true;
+        } else {
+          column.width = newWidth;
+        }
+      }
+    });
+  }
+
+  // resize columns until no width is left to be distributed
+
+  var _loop = function _loop() {
+    var widthPerFlexPoint = remainingWidth / totalFlexGrow;
+    remainingWidth = 0;
+
+    angular.forEach(colsByGroup, function (cols) {
+      colsForEach(cols, widthPerFlexPoint);
+    });
+  };
+
+  do {
+    _loop();
+  } while (remainingWidth !== 0);
+}
+
+/**
+ * Forces the width of the columns to
+ * distribute equally but overflowing when nesc.
+ *
+ * Rules:
+ *
+ *  - If combined withs are less than the total width of the grid,
+ *    proporation the widths given the min / max / noraml widths to fill the width.
+ *
+ *  - If the combined widths, exceed the total width of the grid,
+ *    use the standard widths.
+ *
+ *  - If a column is resized, it should always use that width
+ *
+ *  - The proporational widths should never fall below min size if specified.
+ *
+ *  - If the grid starts off small but then becomes greater than the size ( + / - )
+ *    the width should use the orginial width; not the newly proporatied widths.
+ *
+ * @param {array} allColumns
+ * @param {int} expectedWidth
+ */
+function ForceFillColumnWidths(allColumns, expectedWidth, startIdx) {
+  var contentWidth = 0;
+  var columnsToResize = startIdx > -1 ? allColumns.slice(startIdx, allColumns.length).filter(function (c) {
+    return c.canAutoResize;
+  }) : allColumns.filter(function (c) {
+    return c.canAutoResize;
+  });
+
+  allColumns.forEach(function (c) {
+    if (!c.canAutoResize) {
+      contentWidth += c.width;
+    } else {
+      contentWidth += c.$$oldWidth || c.width;
+    }
+  });
+
+  var remainingWidth = expectedWidth - contentWidth;
+  var additionWidthPerColumn = remainingWidth / columnsToResize.length;
+  var exceedsWindow = contentWidth > expectedWidth;
+
+  columnsToResize.forEach(function (column) {
+    if (exceedsWindow) {
+      column.width = column.$$oldWidth || column.width;
+    } else {
+      if (!column.$$oldWidth) {
+        column.$$oldWidth = column.width;
+      }
+
+      var newSize = column.$$oldWidth + additionWidthPerColumn;
+      if (column.minWith && newSize < column.minWidth) {
+        column.width = column.minWidth;
+      } else if (column.maxWidth && newSize > column.maxWidth) {
+        column.width = column.maxWidth;
+      } else {
+        column.width = newSize;
+      }
+    }
+  });
+}
+
+var DataTableController = function () {
+  /**
+   * Creates an instance of the DataTable Controller
+   * @param  {scope}
+   * @param  {filter}
+   */
+
+  /* @ngInject */
+  DataTableController.$inject = ["$scope", "$filter"];
+  function DataTableController($scope, $filter) {
+    _classCallCheck(this, DataTableController);
+
+    _extends(this, {
+      $scope: $scope,
+      $filter: $filter
+    });
+
+    if (isOldAngular()) {
+      this.$onInit();
+    }
+  }
+
+  _createClass(DataTableController, [{
+    key: '$onInit',
+    value: function $onInit() {
+      this.init();
+    }
+  }, {
+    key: 'init',
+    value: function init() {
+      var _this = this;
+
+      this.defaults();
+
+      // set scope to the parent
+      this.options.$outer = this.$scope.$parent;
+
+      this.$scope.$watch('dt.options.columns', function (newVal, oldVal) {
+        _this.transposeColumnDefaults();
+
+        if (newVal.length !== oldVal.length) {
+          _this.adjustColumns();
+        }
+
+        _this.calculateColumns();
+      }, true);
+
+      this.$scope.$watchCollection('dt.rows', function (newVal, oldVal) {
+        if (newVal && oldVal && newVal.length > oldVal.length) {
+          _this.onSorted();
+        }
+      });
+    }
+
+    /**
+     * Creates and extends default options for the grid control
+     */
+
+  }, {
+    key: 'defaults',
+    value: function defaults() {
+      var _this2 = this;
+
+      this.expanded = this.expanded || {};
+
+      this.options = _extends({}, TableDefaults, this.options);
+
+      angular.forEach(TableDefaults.paging, function (v, k) {
+        if (!_this2.options.paging[k]) {
+          _this2.options.paging[k] = v;
+        }
+      });
+
+      if (this.options.selectable && this.options.multiSelect) {
+        this.selected = this.selected || [];
+
+        this.$scope.$watch('dt.selected', function () {
+          angular.forEach(_this2.options.columns, function (column) {
+            if (column.headerCheckbox && angular.isFunction(column.headerCheckboxCallback)) {
+              column.headerCheckboxCallback(_this2);
+            }
+          });
+        }, true);
+      }
+    }
+
+    /**
+     * On init or when a column is added, we need to
+     * make sure all the columns added have the correct
+     * defaults applied.
+     */
+
+  }, {
+    key: 'transposeColumnDefaults',
+    value: function transposeColumnDefaults() {
+      var _this3 = this;
+
+      var _loop2 = function _loop2(i, len) {
+        var column = _this3.options.columns[i];
+        column.$id = ObjectId();
+
+        angular.forEach(ColumnDefaults, function (v, k) {
+          if (!Object.prototype.hasOwnProperty.call(column, k)) {
+            column[k] = v;
+          }
+        });
+
+        if (column.name && !column.prop) {
+          column.prop = CamelCase(column.name);
+        }
+
+        _this3.options.columns[i] = column;
+      };
+
+      for (var i = 0, len = this.options.columns.length; i < len; i += 1) {
+        _loop2(i, len);
+      }
+    }
+
+    /**
+     * If undefined, set column sortable property to table sortable property value
+     */
+
+  }, {
+    key: 'inheritColumnSortableProps',
+    value: function inheritColumnSortableProps() {
+      var _this4 = this;
+
+      angular.forEach(this.options.columns, function (column) {
+        column.sortable = angular.isDefined(column.sortable) ? column.sortable : _this4.options.sortable;
+      });
+    }
+
+    /**
+     * Calculate column groups and widths
+     */
+
+  }, {
+    key: 'calculateColumns',
+    value: function calculateColumns() {
+      var columns = this.options.columns;
+      this.columnsByPin = ColumnsByPin(columns);
+      this.columnWidths = ColumnGroupWidths(this.columnsByPin, columns);
+    }
+
+    /**
+     * Returns the css classes for the data table.
+     * @return {style object}
+     */
+
+  }, {
+    key: 'tableCss',
+    value: function tableCss() {
+      return {
+        fixed: this.options.scrollbarV,
+        selectable: this.options.selectable,
+        checkboxable: this.options.checkboxSelection
+      };
+    }
+
+    /**
+     * Adjusts the column widths to handle greed/etc.
+     * @param  {int} forceIdx
+     */
+
+  }, {
+    key: 'adjustColumns',
+    value: function adjustColumns(forceIdx) {
+      var width = this.options.internal.innerWidth - this.options.internal.scrollBarWidth;
+
+      if (this.options.columnMode === 'force') {
+        ForceFillColumnWidths(this.options.columns, width, forceIdx);
+      } else if (this.options.columnMode === 'flex') {
+        AdjustColumnWidths(this.options.columns, width);
+      }
+    }
+
+    /**
+     * Calculates the page size given the height * row height.
+     * @return {[type]}
+     */
+
+  }, {
+    key: 'calculatePageSize',
+    value: function calculatePageSize() {
+      this.options.paging.size = Math.ceil(this.options.internal.bodyHeight / this.options.rowHeight) + 1;
+    }
+
+    /**
+     * Sorts the values of the grid for client side sorting.
+     */
+
+  }, {
+    key: 'onSorted',
+    value: function onSorted() {
+      if (!this.rows) {
+        return;
+      }
+
+      // return all sorted column, in the same order in which they were sorted
+      var sorts = this.options.columns.filter(function (c) {
+        return c.sort;
+      }).sort(function (a, b) {
+        // sort the columns with lower sortPriority order first
+        if (a.sortPriority && b.sortPriority) {
+          if (a.sortPriority > b.sortPriority) return 1;
+          if (a.sortPriority < b.sortPriority) return -1;
+        } else if (a.sortPriority) {
+          return -1;
+        } else if (b.sortPriority) {
+          return 1;
+        }
+
+        return 0;
+      }).map(function (c, i) {
+        // update sortPriority
+        c.sortPriority = i + 1;
+        return c;
+      });
+
+      if (sorts.length) {
+        if (this.onSort) {
+          this.onSort({ sorts: sorts });
+        }
+
+        if (this.options.onSort) {
+          this.options.onSort(sorts);
+        }
+
+        var clientSorts = [];
+
+        for (var i = 0, len = sorts.length; i < len; i += 1) {
+          var c = sorts[i];
+          if (c.comparator !== false) {
+            var dir = c.sort === 'asc' ? '' : '-';
+            if (angular.isDefined(c.sortBy)) {
+              clientSorts.push(dir + c.sortBy);
+            } else {
+              clientSorts.push(dir + c.prop);
+            }
+          }
+        }
+
+        if (clientSorts.length) {
+          var _rows;
+
+          // todo: more ideal to just resort vs splice and repush
+          // but wasn't responding to this change ...
+          var sortedValues = this.$filter('orderBy')(this.rows, clientSorts);
+          this.rows.splice(0, this.rows.length);
+          (_rows = this.rows).push.apply(_rows, _toConsumableArray(sortedValues));
+        }
+      }
+
+      if (this.options.internal && this.options.internal.setYOffset) {
+        this.options.internal.setYOffset(0);
+      }
+    }
+
+    /**
+     * Invoked when a tree is collasped/expanded
+     * @param  {row model}
+     * @param  {cell model}
+     */
+
+  }, {
+    key: 'onTreeToggled',
+    value: function onTreeToggled(row, cell) {
+      this.onTreeToggle({
+        row: row,
+        cell: cell
+      });
+    }
+
+    /**
+     * Invoked when the body triggers a page change.
+     * @param  {offset}
+     * @param  {size}
+     */
+
+  }, {
+    key: 'onBodyPage',
+    value: function onBodyPage(offset, size) {
+      this.onPage({
+        offset: offset,
+        size: size
+      });
+    }
+
+    /**
+     * Invoked when the footer triggers a page change.
+     * @param  {offset}
+     * @param  {size}
+     */
+
+  }, {
+    key: 'onFooterPage',
+    value: function onFooterPage(offset, size) {
+      var pageBlockSize = this.options.rowHeight * size;
+      var offsetY = pageBlockSize * offset;
+
+      this.options.internal.setYOffset(offsetY);
+    }
+  }, {
+    key: 'selectAllRows',
+    value: function selectAllRows() {
+      var _selected;
+
+      this.selected.splice(0, this.selected.length);
+
+      (_selected = this.selected).push.apply(_selected, _toConsumableArray(this.rows));
+
+      return this.isAllRowsSelected();
+    }
+  }, {
+    key: 'deselectAllRows',
+    value: function deselectAllRows() {
+      this.selected.splice(0, this.selected.length);
+
+      return this.isAllRowsSelected();
+    }
+
+    /**
+     * Returns if all the rows are selected
+     * @return {Boolean} if all selected
+     */
+
+  }, {
+    key: 'isAllRowsSelected',
+    value: function isAllRowsSelected() {
+      return !this.rows || !this.selected ? false : this.selected.length === this.rows.length;
+    }
+
+    /**
+     * Occurs when a header directive triggered a resize event
+     * @param  {object} column
+     * @param  {int} width
+     */
+
+  }, {
+    key: 'onResized',
+    value: function onResized(column, width) {
+      var idx = this.options.columns.indexOf(column);
+
+      var localColumn = column;
+
+      if (idx > -1) {
+        localColumn = this.options.columns[idx];
+        column.width = width;
+        column.canAutoResize = false;
+
+        this.adjustColumns(idx);
+        this.calculateColumns();
+      }
+
+      if (this.onColumnResize) {
+        this.onColumnResize({
+          column: localColumn,
+          width: width
+        });
+      }
+    }
+
+    /**
+     * Occurs when a row was selected
+     * @param  {object} rows
+     */
+
+  }, {
+    key: 'onSelected',
+    value: function onSelected(rows) {
+      this.onSelect({
+        rows: rows
+      });
+    }
+
+    /**
+     * Occurs when a row was click but may not be selected.
+     * @param  {object} row
+     */
+
+  }, {
+    key: 'onRowClicked',
+    value: function onRowClicked(row) {
+      this.onRowClick({
+        row: row
+      });
+    }
+
+    /**
+     * Occurs when a row was double click but may not be selected.
+     * @param  {object} row
+     */
+
+  }, {
+    key: 'onRowDblClicked',
+    value: function onRowDblClicked(row) {
+      this.onRowDblClick({
+        row: row
+      });
+    }
+  }]);
+
+  return DataTableController;
+}();
+
+/**
+ * Debounce helper
+ * @param  {function}
+ * @param  {int}
+ * @param  {boolean}
+ */
+
+/**
+ * Throttle helper
+ * @param  {function}
+ * @param  {boolean}
+ * @param  {object}
+ */
+
+
+function throttle(func, wait, options) {
+  var _this5 = this;
+
+  return function () {
+    for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+      args[_key] = arguments[_key];
+    }
+
+    var localOptions = options || (options = {});
+
+    var result = void 0;
+    var timeout = null;
+    var previous = 0;
+
+    var later = function later() {
+      previous = localOptions.leading === false ? 0 : new Date();
+      timeout = null;
+      result = func.apply(_this5, args);
+    };
+
+    var now = new Date();
+    if (!previous && localOptions.leading === false) {
+      previous = now;
+    }
+    var remaining = wait - (now - previous);
+
+    if (remaining <= 0) {
+      clearTimeout(timeout);
+      timeout = null;
+      previous = now;
+      result = func.apply(_this5, args);
+    } else if (!timeout && localOptions.trailing !== false) {
+      timeout = setTimeout(later, remaining);
+    }
+    return result;
+  };
+}
+
+var DataTableService = {
+
+  // id: [ column defs ]
+  columns: {},
+  dTables: {},
+
+  saveColumns: function saveColumns(id, columnElms) {
+    if (columnElms && columnElms.length) {
+      var columnsArray = [].slice.call(columnElms);
+      this.dTables[id] = columnsArray;
+    }
+  },
+
+
+  /**
+   * Create columns from elements
+   * @param  {array} columnElms
+   */
+  buildColumns: function buildColumns(scope, parse) {
+    var _this6 = this;
+
+    // FIXME: Too many nested for loops.  O(n3)
+
+    // Iterate through each dTable
+    angular.forEach(this.dTables, function (columnElms, id) {
+      _this6.columns[id] = [];
+
+      // Iterate through each column
+      angular.forEach(columnElms, function (c) {
+        var column = {};
+
+        var visible = true;
+        // Iterate through each attribute
+        angular.forEach(c.attributes, function (attr) {
+          var attrName = CamelCase(attr.name);
+
+          // cuz putting className vs class on
+          // a element feels weird
+          switch (attrName) {
+            case 'class':
+              column.className = attr.value;
+              break;
+            case 'name':
+            case 'prop':
+              column[attrName] = attr.value;
+              break;
+            case 'headerRenderer':
+            case 'cellRenderer':
+            case 'cellDataGetter':
+              column[attrName] = parse(attr.value);
+              break;
+            case 'visible':
+              visible = parse(attr.value)(scope);
+              break;
+            default:
+              column[attrName] = parse(attr.value)(scope);
+              break;
+          }
+        });
+
+        var header = c.getElementsByTagName('column-header');
+
+        if (header.length) {
+          column.headerTemplate = header[0].innerHTML;
+          c.removeChild(header[0]);
+        }
+
+        if (c.innerHTML !== '') {
+          column.template = c.innerHTML;
+        }
+
+        if (visible) {
+          _this6.columns[id].push(column);
+        }
+      });
+    });
+
+    this.dTables = {};
+  }
+};
+
+function DataTableDirective($window, $timeout, $parse) {
+  return {
+    restrict: 'E',
+    replace: true,
+    controller: DataTableController,
+    scope: true,
+    bindToController: {
+      options: '=',
+      rows: '=',
+      selected: '=?',
+      expanded: '=?',
+      onSelect: '&',
+      onSort: '&',
+      onTreeToggle: '&',
+      onPage: '&',
+      onRowClick: '&',
+      onRowDblClick: '&',
+      onColumnResize: '&'
+    },
+    controllerAs: 'dt',
+    template: function template(element) {
+      // Gets the column nodes to transposes to column objects
+      // http://stackoverflow.com/questions/30845397/angular-expressive-directive-design/30847609#30847609
+      var columns = element[0].getElementsByTagName('column');
+      var id = ObjectId();
+
+      DataTableService.saveColumns(id, columns);
+
+      return '<div class="dt" ng-class="dt.tableCss()" data-column-id="' + id + '">\n          <dt-header options="dt.options"\n                     columns="dt.columnsByPin"\n                     column-widths="dt.columnWidths"\n                     ng-if="dt.options.headerHeight"\n                     on-resize="dt.onResized(column, width)"\n                     selected-rows="dt.selected"\n                     all-rows="dt.rows"\n                     on-sort="dt.onSorted()">\n          </dt-header>\n          <dt-body rows="dt.rows"\n                   selected="dt.selected"\n                   expanded="dt.expanded"\n                   columns="dt.columnsByPin"\n                   on-select="dt.onSelected(rows)"\n                   on-row-click="dt.onRowClicked(row)"\n                   on-row-dbl-click="dt.onRowDblClicked(row)"\n                   column-widths="dt.columnWidths"\n                   options="dt.options"\n                   on-page="dt.onBodyPage(offset, size)"\n                   on-tree-toggle="dt.onTreeToggled(row, cell)">\n           </dt-body>\n          <dt-footer ng-if="dt.options.footerHeight || dt.options.paging.mode"\n                     ng-style="{ height: dt.options.footerHeight + \'px\' }"\n                     on-page="dt.onFooterPage(offset, size)"\n                     paging="dt.options.paging">\n           </dt-footer>\n        </div>';
+    },
+    compile: function compile() {
+      return {
+        pre: function pre($scope, $elm, $attrs, ctrl) {
+          DataTableService.buildColumns($scope, $parse);
+
+          // Check and see if we had expressive columns
+          // and if so, lets use those
+          var id = $elm.attr('data-column-id');
+          var columns = DataTableService.columns[id];
+
+          if (columns) {
+            ctrl.options.columns = columns;
+          }
+
+          ctrl.inheritColumnSortableProps();
+          ctrl.transposeColumnDefaults();
+          ctrl.options.internal.scrollBarWidth = ScrollbarWidth();
+
+          /**
+           * Invoked on init of control or when the window is resized;
+           */
+          function resize() {
+            var rect = $elm[0].getBoundingClientRect();
+
+            ctrl.options.internal.innerWidth = Math.floor(rect.width);
+
+            if (ctrl.options.scrollbarV) {
+              var height = rect.height;
+
+              if (ctrl.options.headerHeight) {
+                height -= ctrl.options.headerHeight;
+              }
+
+              if (ctrl.options.footerHeight) {
+                height -= ctrl.options.footerHeight;
+              }
+
+              ctrl.options.internal.bodyHeight = height;
+              ctrl.calculatePageSize();
+            }
+
+            ctrl.adjustColumns();
+          }
+
+          function calculateResize() {
+            throttle(function () {
+              $timeout(resize);
+            });
+          }
+
+          $window.addEventListener('resize', calculateResize);
+
+          // When an item is hidden for example
+          // in a tab with display none, the height
+          // is not calculated correrctly.  We need to watch
+          // the visible attribute and resize if this occurs
+          var checkVisibility = function checkVisibility() {
+            var bounds = $elm[0].getBoundingClientRect();
+            var visible = bounds.width && bounds.height;
+
+            if (visible) {
+              resize();
+            } else {
+              $timeout(checkVisibility, 100);
+            }
+          };
+
+          checkVisibility();
+
+          // add a loaded class to avoid flickering
+          $elm.addClass('dt-loaded');
+
+          // prevent memory leaks
+          $scope.$on('$destroy', function () {
+            angular.element($window).off('resize');
+          });
+        }
+      };
+    }
+  };
+}
+
+var cache = {};
+var testStyle = document.createElement('div').style;
+
+// Get Prefix
+// http://davidwalsh.name/vendor-prefix
+var prefix = function getPrefix() {
+  var styles = window.getComputedStyle(document.documentElement, '');
+  var pre = (Array.prototype.slice.call(styles).join('').match(/-(moz|webkit|ms)-/) || styles.OLink === '' && ['', 'o'])[1];
+  var dom = 'WebKit|Moz|MS|O'.match(new RegExp('(' + pre + ')', 'i'))[1];
+
+  return {
+    dom: dom,
+    lowercase: pre,
+    css: '-' + pre + '-',
+    js: pre[0].toUpperCase() + pre.substr(1)
+  };
+}();
+
+/**
+ * @param {string} property Name of a css property to check for.
+ * @return {?string} property name supported in the browser, or null if not
+ * supported.
+ */
+function GetVendorPrefixedName(property) {
+  var name = CamelCase(property);
+  if (!cache[name]) {
+    if (angular.isDefined(testStyle[prefix.css + property])) {
+      cache[name] = prefix.css + property;
+    } else if (angular.isDefined(testStyle[property])) {
+      cache[name] = property;
+    }
+  }
+  return cache[name];
+}
+
+// browser detection and prefixing tools
+var ua = window.navigator.userAgent;
+var transform = GetVendorPrefixedName('transform');
+var backfaceVisibility = GetVendorPrefixedName('backfaceVisibility');
+var hasCSSTransforms = !!GetVendorPrefixedName('transform');
+var hasCSS3DTransforms = !!GetVendorPrefixedName('perspective');
+var isSafari = /Safari\//.test(ua) && !/Chrome\//.test(ua);
+
+function TranslateXY(styles, x, y) {
+  if (hasCSSTransforms) {
+    if (!isSafari && hasCSS3DTransforms) {
+      styles[transform] = 'translate3d(' + x + 'px, ' + y + 'px, 0)';
+      styles[backfaceVisibility] = 'hidden';
+    } else {
+      styles[CamelCase(transform)] = 'translate(' + x + 'px, ' + y + 'px)';
+    }
+  } else {
+    styles.top = y + 'px';
+    styles.left = x + 'px';
+  }
+}
+
+var HeaderController = function () {
+  function HeaderController() {
+    _classCallCheck(this, HeaderController);
+  }
+
+  _createClass(HeaderController, [{
+    key: 'styles',
+
+    /**
+     * Returns the styles for the header directive.
+     * @param  {object} scope
+     * @return {object} styles
+     */
+    value: function styles() {
+      return {
+        width: this.options.internal.innerWidth + 'px',
+        height: this.options.headerHeight + 'px'
+      };
+    }
+
+    /**
+     * Returns the inner styles for the header directive
+     * @param  {object} scope
+     * @return {object} styles
+     */
+
+  }, {
+    key: 'innerStyles',
+    value: function innerStyles() {
+      return {
+        width: this.columnWidths.total + 'px'
+      };
+    }
+
+    /**
+     * Invoked when a column sort direction has changed
+     * @param  {object} sortedColumn
+     * @param  {object} modifierPressed
+     */
+
+  }, {
+    key: 'onSorted',
+    value: function onSorted(sortedColumn, modifierPressed) {
+      // if sort type is single, then only one column can be sorted at once,
+      // so we set the sort to undefined for the other columns
+      function unsortColumn(column) {
+        if (column !== sortedColumn) {
+          column.sort = undefined;
+        }
+      }
+
+      if (this.options.sortType === 'single' && !(this.options.modifierActive && modifierPressed) || this.options.sortType === 'multiple' && this.options.modifierActive && modifierPressed) {
+        this.columns.left.forEach(unsortColumn);
+        this.columns.center.forEach(unsortColumn);
+        this.columns.right.forEach(unsortColumn);
+      }
+
+      this.onSort({
+        column: sortedColumn
+      });
+    }
+
+    /**
+     * Returns the styles by group for the headers.
+     * @param  {scope}
+     * @param  {group}
+     * @return {styles object}
+     */
+
+  }, {
+    key: 'stylesByGroup',
+    value: function stylesByGroup(group) {
+      var styles = {
+        width: this.columnWidths[group] + 'px'
+      };
+
+      if (group === 'center') {
+        TranslateXY(styles, this.options.internal.offsetX * -1, 0);
+      } else if (group === 'right') {
+        var offset = (this.columnWidths.total - this.options.internal.innerWidth) * -1;
+        TranslateXY(styles, offset, 0);
+      }
+
+      return styles;
+    }
+
+    /**
+     * Occurs when a header cell directive triggered a resize
+     * @param  {object} scope
+     * @param  {object} column
+     * @param  {int} width
+     */
+
+  }, {
+    key: 'onResized',
+    value: function onResized(column, width) {
+      this.onResize({
+        column: column,
+        width: width
+      });
+    }
+  }]);
+
+  return HeaderController;
+}();
+
+function HeaderDirective($timeout) {
+  return {
+    restrict: 'E',
+    controller: HeaderController,
+    controllerAs: 'header',
+    scope: true,
+    bindToController: {
+      options: '=',
+      columns: '=',
+      columnWidths: '=',
+      selectedRows: '=?',
+      allRows: '=',
+      onSort: '&',
+      onResize: '&'
+    },
+    template: '\n      <div class="dt-header" ng-style="header.styles()">\n        <div class="dt-header-inner" ng-style="header.innerStyles()">\n          <div class="dt-row-left"\n               ng-style="header.stylesByGroup(\'left\')"\n               ng-if="header.columns[\'left\'].length"\n               sortable="header.options.reorderable"\n               on-sortable-sort="columnsResorted(event, columnId)">\n            <dt-header-cell\n              ng-repeat="column in header.columns[\'left\'] track by column.$id"\n              on-sort="header.onSorted(column, modifierPressed)"\n              options="header.options"\n              sort-type="header.options.sortType"\n              on-resize="header.onResized(column, width)"\n              all-rows="header.allRows"\n              column="column">\n            </dt-header-cell>\n          </div>\n          <div class="dt-row-center"\n               sortable="header.options.reorderable"\n               ng-style="header.stylesByGroup(\'center\')"\n               on-sortable-sort="columnsResorted(event, columnId)">\n            <dt-header-cell\n              ng-repeat="column in header.columns[\'center\'] track by column.$id"\n              on-checkbox-change="header.onCheckboxChanged()"\n              on-sort="header.onSorted(column, modifierPressed)"\n              sort-type="header.options.sortType"\n              selected="header.isSelected()"\n              on-resize="header.onResized(column, width)"\n              options="header.options"\n              column="column">\n            </dt-header-cell>\n          </div>\n          <div class="dt-row-right"\n               ng-if="header.columns[\'right\'].length"\n               sortable="header.options.reorderable"\n               ng-style="header.stylesByGroup(\'right\')"\n               on-sortable-sort="columnsResorted(event, columnId)">\n            <dt-header-cell\n              ng-repeat="column in header.columns[\'right\'] track by column.$id"\n              on-checkbox-change="header.onCheckboxChanged()"\n              on-sort="header.onSorted(column, modifierPressed)"\n              sort-type="header.options.sortType"\n              selected="header.isSelected()"\n              on-resize="header.onResized(column, width)"\n              options="header.options"\n              column="column">\n            </dt-header-cell>\n          </div>\n        </div>\n      </div>',
+    replace: true,
+    link: function link($scope, $elm, $attrs, ctrl) {
+      $scope.columnsResorted = function columnsResorted(event, columnId) {
+        var col = findColumnById(columnId);
+        var parent = angular.element(event.currentTarget);
+
+        var newIdx = -1;
+
+        angular.forEach(parent.children(), function (c, i) {
+          if (columnId === angular.element(c).attr('data-id')) {
+            newIdx = i;
+          }
+        });
+
+        $timeout(function () {
+          angular.forEach(ctrl.columns, function (group) {
+            var idx = group.indexOf(col);
+            if (idx > -1) {
+              // this is tricky because we want to update the index
+              // in the orig columns array instead of the grouped one
+              var curColAtIdx = group[newIdx];
+              var siblingIdx = ctrl.options.columns.indexOf(curColAtIdx);
+              var curIdx = ctrl.options.columns.indexOf(col);
+
+              ctrl.options.columns.splice(curIdx, 1);
+              ctrl.options.columns.splice(siblingIdx, 0, col);
+
+              return false;
+            }
+
+            return undefined;
+          });
+        });
+      };
+
+      var findColumnById = function findColumnById(columnId) {
+        var columns = ctrl.columns.left.concat(ctrl.columns.center).concat(ctrl.columns.right);
+        return columns.find(function (c) {
+          return c.$id === columnId;
+        });
+      };
+    }
+  };
+}
+
+var HeaderCellController = function () {
+  /* @ngInject */
+  HeaderCellController.$inject = ["$scope"];
+  function HeaderCellController($scope) {
+    _classCallCheck(this, HeaderCellController);
+
+    _extends(this, {
+      $scope: $scope
+    });
+
+    if (isOldAngular()) {
+      this.$onInit();
+    }
+  }
+
+  _createClass(HeaderCellController, [{
+    key: '$onInit',
+    value: function $onInit() {
+      this.init();
+    }
+  }, {
+    key: 'init',
+    value: function init() {
+      if (this.column.headerCheckbox) {
+        this.column.headerCheckboxCallback = this.rowSelected;
+      }
+
+      if (this.$scope.$parent.$parent.$parent.$parent.dt) {
+        this.dt = this.$scope.$parent.$parent.$parent.$parent.dt;
+      }
+    }
+    /**
+     * Calculates the styles for the header cell directive
+     * @return {styles}
+     */
+
+  }, {
+    key: 'styles',
+    value: function styles() {
+      return {
+        width: this.column.width + 'px',
+        minWidth: this.column.minWidth + 'px',
+        maxWidth: this.column.maxWidth + 'px',
+        height: this.column.height + 'px'
+      };
+    }
+
+    /**
+     * Calculates the css classes for the header cell directive
+     */
+
+  }, {
+    key: 'cellClass',
+    value: function cellClass() {
+      var cls = {
+        sortable: this.column.sortable,
+        resizable: this.column.resizable
+      };
+
+      if (this.column.headerClassName) {
+        cls[this.column.headerClassName] = true;
+      }
+
+      return cls;
+    }
+
+    /**
+     * Toggles the sorting on the column
+     */
+
+  }, {
+    key: 'onSorted',
+    value: function onSorted(event) {
+      if (this.column.sortable) {
+        this.column.sort = NextSortDirection(this.sortType, this.column.sort);
+
+        if (angular.isUndefined(this.column.sort)) {
+          this.column.sortPriority = undefined;
+        }
+
+        this.onSort({
+          column: this.column,
+          modifierPressed: event.shiftKey
+        });
+      }
+    }
+
+    /**
+     * Toggles the css class for the sort button
+     */
+
+  }, {
+    key: 'sortClass',
+    value: function sortClass() {
+      return {
+        'sort-btn': true,
+        'sort-asc icon-down': this.column.sort === 'asc',
+        'sort-desc icon-up': this.column.sort === 'desc'
+      };
+    }
+
+    /**
+     * Updates the column width on resize
+     * @param  {width}
+     * @param  {column}
+     */
+
+  }, {
+    key: 'onResized',
+    value: function onResized(width, column) {
+      this.onResize({
+        column: column,
+        width: width
+      });
+    }
+  }, {
+    key: 'rowSelected',
+    value: function rowSelected(dt) {
+      this.allRowsSelected = dt.selected && dt.rows.length === dt.selected.length;
+    }
+
+    /**
+     * Invoked when the header cell directive checkbox is changed
+     */
+
+  }, {
+    key: 'checkboxChangeCallback',
+    value: function checkboxChangeCallback() {
+      this.isAllRowsSelected = this.column.allRowsSelected;
+
+      return this.isAllRowsSelected ? this.dt.selectAllRows() : this.dt.deselectAllRows();
+    }
+  }]);
+
+  return HeaderCellController;
+}();
+
+function HeaderCellDirective($compile) {
+  return {
+    restrict: 'E',
+    controller: HeaderCellController,
+    controllerAs: 'hcell',
+    scope: true,
+    bindToController: {
+      options: '=',
+      column: '=',
+      onSort: '&',
+      sortType: '=',
+      onResize: '&',
+      selected: '='
+    },
+    replace: true,
+    template: '<div ng-class="hcell.cellClass()"\n            class="dt-header-cell"\n            draggable="true"\n            data-id="{{column.$id}}"\n            ng-style="hcell.styles()"\n            title="{{::hcell.column.name}}">\n        <div resizable="hcell.column.resizable"\n             on-resize="hcell.onResized(width, hcell.column)"\n             min-width="hcell.column.minWidth"\n             max-width="hcell.column.maxWidth">\n          <label ng-if="hcell.column.isCheckboxColumn && hcell.column.headerCheckbox" class="dt-checkbox">\n            <input type="checkbox"\n                   ng-model="hcell.column.allRowsSelected"\n                   ng-change="hcell.checkboxChangeCallback()" />\n          </label>\n          <span class="dt-header-cell-label"\n                ng-click="hcell.onSorted($event)">\n          </span>\n          <span ng-class="hcell.sortClass()">{{hcell.column.sortPriority}}</span>\n        </div>\n      </div>',
+    compile: function compile() {
+      return {
+        pre: function pre($scope, $elm, $attrs, ctrl) {
+          var label = $elm[0].querySelector('.dt-header-cell-label');
+
+          var cellScope = void 0;
+
+          if (ctrl.column.headerTemplate || ctrl.column.headerRenderer) {
+            cellScope = ctrl.options.$outer.$new(false);
+
+            // copy some props
+            cellScope.$header = ctrl.column.name;
+            cellScope.$index = $scope.$index;
+          }
+
+          if (ctrl.column.headerTemplate) {
+            var elm = angular.element('<span>' + ctrl.column.headerTemplate.trim() + '</span>');
+            angular.element(label).append($compile(elm)(cellScope));
+          } else if (ctrl.column.headerRenderer) {
+            var _elm = angular.element(ctrl.column.headerRenderer($elm));
+            angular.element(label).append($compile(_elm)(cellScope)[0]);
+          } else {
+            var val = ctrl.column.name;
+            if (angular.isUndefined(val) || val === null) val = '';
+            label.textContent = val;
+          }
+        }
+      };
+    }
+  };
+}
+
+var TREE_TYPES = {
+  GROUP: 'refreshGroups',
+  TREE: 'refreshTree'
+};
+
+var BodyController = function () {
+  /**
+   * A body controller
+   * @param  {$scope}
+   * @return {BodyController}
+   */
+
+  /* @ngInject */
+  BodyController.$inject = ["$scope"];
+  function BodyController($scope) {
+    _classCallCheck(this, BodyController);
+
+    _extends(this, {
+      $scope: $scope
+    });
+
+    if (isOldAngular()) {
+      this.$onInit();
+    }
+  }
+
+  _createClass(BodyController, [{
+    key: '$onInit',
+    value: function $onInit() {
+      this.init();
+    }
+  }, {
+    key: 'init',
+    value: function init() {
+      var _this7 = this;
+
+      this.tempRows = [];
+      this.watchListeners = [];
+
+      this.setTreeAndGroupColumns();
+      this.setConditionalWatches();
+
+      this.$scope.$watch('body.options.columns', function (newVal) {
+        if (newVal) {
+          var origTreeColumn = angular.copy(_this7.treeColumn);
+          var origGroupColumn = angular.copy(_this7.groupColumn);
+
+          _this7.setTreeAndGroupColumns();
+
+          _this7.setConditionalWatches();
+
+          if (_this7.treeColumn && origTreeColumn !== _this7.treeColumn || _this7.groupColumn && origGroupColumn !== _this7.groupColumn) {
+            _this7.rowsUpdated(_this7.rows);
+
+            if (_this7.treeColumn) {
+              _this7.refreshTree();
+            } else if (_this7.groupColumn) {
+              _this7.refreshGroups();
+            }
+          }
+        }
+      }, true);
+
+      this.$scope.$watchCollection('body.rows', this.rowsUpdated.bind(this));
+    }
+  }, {
+    key: 'setTreeAndGroupColumns',
+    value: function setTreeAndGroupColumns() {
+      if (this.options && this.options.columns) {
+        this.treeColumn = this.options.columns.find(function (c) {
+          return c.isTreeColumn;
+        });
+
+        if (!this.treeColumn) {
+          this.groupColumn = this.options.columns.find(function (c) {
+            return c.group;
+          });
+        } else {
+          this.groupColumn = undefined;
+        }
+      }
+    }
+
+    /**
+     * @description Constructs the rows for the page, assuming we're using internal paging.
+     */
+
+  }, {
+    key: 'buildInternalPage',
+    value: function buildInternalPage() {
+      var i = void 0;
+      var rowsIndex = void 0;
+
+      this.tempRows.splice(0, this.tempRows.length);
+
+      for (i = 0; i < this.options.paging.size; i += 1) {
+        rowsIndex = this.options.paging.offset * this.options.paging.size + i;
+
+        if (angular.isDefined(this.rows[rowsIndex])) {
+          this.tempRows[i] = this.rows[rowsIndex];
+        }
+      }
+    }
+  }, {
+    key: 'setConditionalWatches',
+    value: function setConditionalWatches() {
+      var _this8 = this;
+
+      for (var i = this.watchListeners.length - 1; i >= 0; i -= 1) {
+        this.watchListeners[i]();
+
+        this.watchListeners.splice(i, 1);
+      }
+
+      if (this.options && (this.options.scrollbarV || !this.options.scrollbarV && this.options.paging && this.options.paging.size)) {
+        var sized = false;
+
+        this.watchListeners.push(this.$scope.$watch('body.options.paging.size', function (newVal, oldVal) {
+          if (!sized || newVal > oldVal) {
+            _this8.getRows();
+            sized = true;
+          }
+        }));
+
+        this.watchListeners.push(this.$scope.$watch('body.options.paging.count', function (count) {
+          _this8.count = count;
+          _this8.updatePage();
+        }));
+
+        this.watchListeners.push(this.$scope.$watch('body.options.paging.offset', function (newVal) {
+          if (_this8.options.paging.size) {
+            if (_this8.options.paging.mode === 'internal') {
+              _this8.buildInternalPage();
+            }
+
+            if (_this8.onPage) {
+              _this8.onPage({
+                offset: newVal,
+                size: _this8.options.paging.size
+              });
+            }
+          }
+        }));
+      }
+    }
+  }, {
+    key: 'rowsUpdated',
+    value: function rowsUpdated(newVal, oldVal) {
+      if (!newVal) {
+        this.getRows(true);
+      } else {
+        if (this.options.paging.mode !== 'external') {
+          this.options.paging.count = newVal.length;
+        }
+
+        this.count = this.options.paging.count;
+
+        if (this.treeColumn || this.groupColumn) {
+          this.buildRowsByGroup();
+        }
+
+        if (this.options.scrollbarV) {
+          var refresh = newVal && oldVal && (newVal.length === oldVal.length || newVal.length < oldVal.length);
+
+          this.getRows(refresh);
+        } else {
+          var rows = this.rows;
+
+          if (this.treeColumn) {
+            rows = this.buildTree();
+          } else if (this.groupColumn) {
+            rows = this.buildGroups();
+          }
+
+          if (this.options.paging.mode === 'external') {
+            // We're using external paging
+            var idxs = this.getFirstLastIndexes();
+            var idx = idxs.first;
+
+            this.tempRows.splice(0, this.tempRows.length);
+            while (idx < idxs.last) {
+              this.tempRows.push(rows[idx += 1]);
+            }
+          } else if (this.options.paging.mode === 'internal') {
+            // We're using internal paging
+            this.buildInternalPage();
+          } else {
+            var _tempRows;
+
+            // No paging
+            this.tempRows.splice(0, this.tempRows.length);
+            (_tempRows = this.tempRows).push.apply(_tempRows, _toConsumableArray(rows));
+          }
+        }
+      }
+    }
+
+    /**
+     * Gets the first and last indexes based on the offset, row height, page size, and overall count.
+     */
+
+  }, {
+    key: 'getFirstLastIndexes',
+    value: function getFirstLastIndexes() {
+      var firstRowIndex = void 0;
+      var endIndex = void 0;
+
+      if (this.options.scrollbarV) {
+        firstRowIndex = Math.max(Math.floor((this.options.internal.offsetY || 0) / this.options.rowHeight, 0), 0);
+        endIndex = Math.min(firstRowIndex + this.options.paging.size, this.count);
+      } else if (this.options.paging.mode === 'external') {
+        firstRowIndex = Math.max(this.options.paging.offset * this.options.paging.size, 0);
+        endIndex = Math.min(firstRowIndex + this.options.paging.size, this.count);
+      } else {
+        endIndex = this.count;
+      }
+
+      return {
+        first: firstRowIndex,
+        last: endIndex
+      };
+    }
+
+    /**
+     * Updates the page's offset given the scroll position.
+     */
+
+  }, {
+    key: 'updatePage',
+    value: function updatePage() {
+      var curPage = this.options.paging.offset;
+      var idxs = this.getFirstLastIndexes();
+
+      if (angular.isUndefined(this.options.internal.oldScrollPosition)) {
+        this.options.internal.oldScrollPosition = 0;
+      }
+
+      var oldScrollPosition = this.options.internal.oldScrollPosition;
+      var newPage = idxs.first / this.options.paging.size;
+
+      this.options.internal.oldScrollPosition = newPage;
+
+      if (newPage < oldScrollPosition) {
+        // scrolling up
+        newPage = Math.floor(newPage);
+      } else if (newPage > oldScrollPosition) {
+        // scrolling down
+        newPage = Math.ceil(newPage);
+      } else {
+        // equal, just stay on the current page
+        newPage = curPage;
+      }
+
+      if (!isNaN(newPage)) {
+        this.options.paging.offset = newPage;
+      }
+    }
+
+    /**
+     * Recursively calculate row depth for unsorted backend data
+     * @param row
+     * @param depth
+     * @return {Integer}
+    */
+
+  }, {
+    key: 'calculateDepth',
+    value: function calculateDepth(row) {
+      var depth = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+
+      var parentProp = this.treeColumn ? this.treeColumn.relationProp : this.groupColumn.prop;
+      var prop = this.treeColumn.prop;
+
+      if (!row[parentProp]) {
+        return depth;
+      }
+
+      if (row.$$depth) {
+        return row.$$depth + depth;
+      }
+
+      /* Get data from cache, if exists*/
+      var cachedParent = this.index[row[parentProp]];
+
+      if (cachedParent) {
+        depth += 1;
+        return this.calculateDepth(cachedParent, depth);
+      }
+
+      for (var i = 0, len = this.rows.length; i < len; i += 1) {
+        var parent = this.rows[i];
+        if (parent[prop] === row[parentProp]) {
+          depth += 1;
+          return this.calculateDepth(parent, depth);
+        }
+      }
+
+      return depth;
+    }
+
+    /**
+     * Matches groups to their respective parents by index.
+     *
+     * Example:
+     *
+     *  {
+     *    "Acme" : [
+     *      { name: "Acme Holdings", parent: "Acme" }
+     *    ],
+     *    "Acme Holdings": [
+     *      { name: "Acme Ltd", parent: "Acme Holdings" }
+     *    ]
+     *  }
+     *
+     */
+
+  }, {
+    key: 'buildRowsByGroup',
+    value: function buildRowsByGroup() {
+      this.index = {};
+      this.rowsByGroup = {};
+
+      var parentProp = this.treeColumn ? this.treeColumn.relationProp : this.groupColumn.prop;
+
+      for (var i = 0, len = this.rows.length; i < len; i += 1) {
+        var row = this.rows[i];
+        // build groups
+        var relVal = row[parentProp];
+        if (relVal) {
+          if (this.rowsByGroup[relVal]) {
+            this.rowsByGroup[relVal].push(row);
+          } else {
+            this.rowsByGroup[relVal] = [row];
+          }
+        }
+
+        // build indexes
+        if (this.treeColumn) {
+          var prop = this.treeColumn.prop;
+          this.index[row[prop]] = row;
+
+          if (angular.isUndefined(row[parentProp])) {
+            row.$$depth = 0;
+          } else {
+            var parent = this.index[row[parentProp]];
+            if (angular.isUndefined(parent)) {
+              for (var j = 0; j < len; j += 1) {
+                if (this.rows[j][prop] === relVal) {
+                  parent = this.rows[j];
+                  break;
+                }
+              }
+            }
+
+            if (angular.isUndefined(parent.$$depth)) {
+              parent.$$depth = this.calculateDepth(parent);
+            }
+
+            row.$$depth = parent.$$depth + 1;
+
+            if (parent.$$children) {
+              parent.$$children.push(row[prop]);
+            } else {
+              parent.$$children = [row[prop]];
+            }
+          }
+        }
+      }
+    }
+
+    /**
+     * Rebuilds the groups based on what is expanded.
+     * This function needs some optimization, todo for future release.
+     * @return {Array} the temp array containing expanded rows
+     */
+
+  }, {
+    key: 'buildGroups',
+    value: function buildGroups() {
+      var _this9 = this;
+
+      var temp = [];
+
+      angular.forEach(this.rowsByGroup, function (v, k) {
+        temp.push({
+          name: k,
+          group: true
+        });
+
+        if (_this9.expanded[k]) {
+          temp.push.apply(temp, _toConsumableArray(v));
+        }
+      });
+
+      return temp;
+    }
+
+    /**
+     * Returns if the row is selected
+     * @param  {row}
+     * @return {Boolean}
+     */
+
+  }, {
+    key: 'isSelected',
+    value: function isSelected(row) {
+      var selected = false;
+
+      if (this.options.selectable) {
+        if (this.options.multiSelect) {
+          selected = this.selected.indexOf(row) > -1;
+        } else {
+          selected = this.selected === row;
+        }
+      }
+
+      return selected;
+    }
+
+    /**
+     * Creates a tree of the existing expanded values
+     * @return {array} the built tree
+     */
+
+  }, {
+    key: 'buildTree',
+    value: function buildTree() {
+      var temp = [];
+      var self = this;
+
+      var addChildren = function addChildren(fromArray, toArray, level) {
+        fromArray.forEach(function (row) {
+          var relVal = row[self.treeColumn.relationProp];
+          var key = row[self.treeColumn.prop];
+          var groupRows = self.rowsByGroup[key];
+          var expanded = self.expanded[key];
+
+          if (level > 0 || !relVal) {
+            toArray.push(row);
+            if (groupRows && groupRows.length > 0 && expanded) {
+              addChildren(groupRows, toArray, level + 1);
+            }
+          }
+        });
+      };
+
+      addChildren(this.rows, temp, 0);
+
+      return temp;
+    }
+
+    /**
+     * Creates the intermediate collection that is shown in the view.
+     * @param  {boolean} refresh - bust the tree/group cache
+     */
+
+  }, {
+    key: 'getRows',
+    value: function getRows(refresh) {
+      // only proceed when we have pre-aggregated the values
+      if ((this.treeColumn || this.groupColumn) && !this.rowsByGroup) {
+        return false;
+      }
+
+      var temp = void 0;
+
+      if (this.treeColumn) {
+        temp = this.treeTemp || [];
+        // cache the tree build
+        if (refresh || !this.treeTemp) {
+          temp = this.buildTree();
+          this.treeTemp = temp;
+          this.count = temp.length;
+
+          // have to force reset, optimize this later
+          this.tempRows.splice(0, this.tempRows.length);
+        }
+      } else if (this.groupColumn) {
+        temp = this.groupsTemp || [];
+        // cache the group build
+        if (refresh || !this.groupsTemp) {
+          temp = this.buildGroups();
+          this.groupsTemp = temp;
+          this.count = temp.length;
+        }
+      } else {
+        temp = this.rows;
+        if (refresh === true) {
+          this.tempRows.splice(0, this.tempRows.length);
+        }
+      }
+
+      var idx = 0;
+      var indexes = this.getFirstLastIndexes();
+      var rowIndex = indexes.first;
+
+      // slice out the old rows so we don't have duplicates
+      this.tempRows.splice(0, indexes.last - indexes.first);
+
+      while (rowIndex < indexes.last && rowIndex < this.count) {
+        var row = temp[rowIndex];
+
+        if (row) {
+          row.$$index = rowIndex;
+          this.tempRows[idx] = row;
+        }
+
+        idx += 1;
+        rowIndex += 1;
+      }
+
+      if (this.options.internal && this.options.internal.styleTranslator) {
+        this.options.internal.styleTranslator.update(this.tempRows);
+      }
+
+      return this.tempRows;
+    }
+
+    /**
+     * Returns the styles for the table body directive.
+     * @return {object}
+     */
+
+  }, {
+    key: 'styles',
+    value: function styles() {
+      var styles = {
+        width: this.options.internal.innerWidth + 'px'
+      };
+
+      if (!this.options.scrollbarV) {
+        styles.overflowY = 'hidden';
+      } else if (this.options.scrollbarH === false) {
+        styles.overflowX = 'hidden';
+      }
+
+      if (this.options.scrollbarV) {
+        styles.height = this.options.internal.bodyHeight + 'px';
+      }
+
+      return styles;
+    }
+
+    /**
+     * Returns the styles for the row diretive.
+     * @param  {row}
+     * @return {styles object}
+     */
+
+  }, {
+    key: 'rowStyles',
+    value: function rowStyles() {
+      var styles = {};
+
+      if (this.options.rowHeight === 'auto') {
+        styles.height = this.options.rowHeight + 'px';
+      }
+
+      return styles;
+    }
+
+    /**
+     * Builds the styles for the row group directive
+     * @param  {object} row
+     * @return {object} styles
+     */
+
+  }, {
+    key: 'groupRowStyles',
+    value: function groupRowStyles(row) {
+      var styles = this.rowStyles(row);
+      styles.width = this.columnWidths.total + 'px';
+      return styles;
+    }
+
+    /**
+     * Returns the css classes for the row directive.
+     * @param  {row}
+     * @return {css class object}
+     */
+
+  }, {
+    key: 'rowClasses',
+    value: function rowClasses(row) {
+      var styles = {
+        selected: this.isSelected(row),
+        'dt-row-even': row && row.$$index % 2 === 0,
+        'dt-row-odd': row && row.$$index % 2 !== 0
+      };
+
+      if (this.treeColumn) {
+        // if i am a child
+        styles['dt-leaf'] = this.rowsByGroup[row[this.treeColumn.relationProp]];
+        // if i have children
+        styles['dt-has-leafs'] = this.rowsByGroup[row[this.treeColumn.prop]];
+        // the depth
+        styles['dt-depth-' + row.$$depth] = true;
+      }
+
+      return styles;
+    }
+
+    /**
+     * Returns the row model for the index in the view.
+     * @param  {index}
+     * @return {row model}
+     */
+
+  }, {
+    key: 'getRowValue',
+    value: function getRowValue(idx) {
+      return this.tempRows[idx];
+    }
+
+    /**
+     * Calculates if a row is expanded or collasped for tree grids.
+     * @param  {row}
+     * @return {boolean}
+     */
+
+  }, {
+    key: 'getRowExpanded',
+    value: function getRowExpanded(row) {
+      if (this.treeColumn) {
+        return this.expanded[row[this.treeColumn.prop]];
+      } else if (this.groupColumn) {
+        return this.expanded[row.name];
+      }
+
+      return undefined;
+    }
+  }, {
+    key: 'refresh',
+    value: function refresh(type) {
+      if (this.options.scrollbarV) {
+        this.getRows(true);
+      } else {
+        var _tempRows2;
+
+        var values = this[type]();
+        this.tempRows.splice(0, this.tempRows.length);
+        (_tempRows2 = this.tempRows).push.apply(_tempRows2, _toConsumableArray(values));
+      }
+    }
+
+    /**
+     * Calculates if the row has children
+     * @param  {row}
+     * @return {boolean}
+     */
+
+  }, {
+    key: 'getRowHasChildren',
+    value: function getRowHasChildren(row) {
+      if (!this.treeColumn) return undefined;
+
+      var children = this.rowsByGroup[row[this.treeColumn.prop]];
+
+      return angular.isDefined(children) || children && !children.length;
+    }
+  }, {
+    key: 'refreshTree',
+    value: function refreshTree() {
+      this.refresh(TREE_TYPES.TREE);
+    }
+
+    /**
+     * Tree toggle event from a cell
+     * @param  {row model}
+     * @param  {cell model}
+     */
+
+  }, {
+    key: 'onTreeToggled',
+    value: function onTreeToggled(row, cell) {
+      var val = row[this.treeColumn.prop];
+      this.expanded[val] = !this.expanded[val];
+
+      this.refreshTree();
+
+      this.onTreeToggle({
+        row: row,
+        cell: cell
+      });
+    }
+  }, {
+    key: 'refreshGroups',
+    value: function refreshGroups() {
+      this.refresh(TREE_TYPES.GROUP);
+    }
+
+    /**
+     * Invoked when the row group directive was expanded
+     * @param  {object} row
+     */
+
+  }, {
+    key: 'onGroupToggle',
+    value: function onGroupToggle(row) {
+      this.expanded[row.name] = !this.expanded[row.name];
+
+      this.refreshGroups();
+    }
+  }]);
+
+  return BodyController;
+}();
+
+function BodyDirective() {
+  return {
+    restrict: 'E',
+    controller: BodyController,
+    controllerAs: 'body',
+    bindToController: {
+      columns: '=',
+      columnWidths: '=',
+      rows: '=',
+      options: '=',
+      selected: '=?',
+      expanded: '=?',
+      onPage: '&',
+      onTreeToggle: '&',
+      onSelect: '&',
+      onRowClick: '&',
+      onRowDblClick: '&'
+    },
+    scope: true,
+    template: '\n      <div\n        class="progress-linear"\n        role="progressbar"\n        ng-show="body.options.loadingIndicator">\n        <div class="container">\n          <div class="bar"></div>\n        </div>\n      </div>\n      <div class="dt-body" ng-style="body.styles()" dt-selection>\n        <dt-scroller class="dt-body-scroller">\n          <dt-group-row ng-repeat-start="r in body.tempRows track by $index"\n                        ng-if="r.group"\n                        ng-style="body.groupRowStyles(r)"\n                        options="body.options"\n                        on-group-toggle="body.onGroupToggle(group)"\n                        expanded="body.getRowExpanded(r)"\n                        tabindex="{{$index}}"\n                        row="r">\n          </dt-group-row>\n          <dt-row ng-repeat-end\n                  ng-if="!r.group"\n                  row="body.getRowValue($index)"\n                  tabindex="{{$index}}"\n                  columns="body.columns"\n                  column-widths="body.columnWidths"\n                  ng-keydown="selCtrl.keyDown($event, $index, r)"\n                  ng-click="selCtrl.rowClicked($event, r.$$index, r)"\n                  ng-dblclick="selCtrl.rowDblClicked($event, r.$$index, r)"\n                  on-tree-toggle="body.onTreeToggled(row, cell)"\n                  ng-class="body.rowClasses(r)"\n                  options="body.options"\n                  selected="body.isSelected(r)"\n                  on-checkbox-change="selCtrl.onCheckboxChange($event, $index, row)"\n                  columns="body.columnsByPin"\n                  has-children="body.getRowHasChildren(r)"\n                  expanded="body.getRowExpanded(r)"\n                  ng-style="body.rowStyles(r)">\n          </dt-row>\n        </dt-scroller>\n        <div ng-if="body.rows && !body.rows.length"\n             class="empty-row"\n             ng-bind="::body.options.emptyMessage">\n       </div>\n       <div ng-if="body.rows === undefined"\n             class="loading-row"\n             ng-bind="::body.options.loadingMessage">\n        </div>\n      </div>'
+  };
+}
+
+/**
+ * This translates the dom position based on the model row index.
+ * This only exists because Angular's binding process is too slow.
+ */
+
+var StyleTranslator = function () {
+  function StyleTranslator(height) {
+    _classCallCheck(this, StyleTranslator);
+
+    this.height = height;
+    this.map = new Map();
+  }
+
+  /**
+   * Update the rows
+   * @param  {Array} rows
+   */
+
+
+  _createClass(StyleTranslator, [{
+    key: 'update',
+    value: function update(rows) {
+      var n = 0;
+      while (n <= this.map.size) {
+        var dom = this.map.get(n);
+        var model = rows[n];
+
+        if (dom && model) {
+          TranslateXY(dom[0].style, 0, model.$$index * this.height);
+        }
+
+        n += 1;
+      }
+    }
+
+    /**
+     * Register the row
+     * @param  {int} idx
+     * @param  {dom} dom
+     */
+
+  }, {
+    key: 'register',
+    value: function register(idx, dom) {
+      this.map.set(idx, dom);
+    }
+  }]);
+
+  return StyleTranslator;
+}();
+
+function ScrollerDirective() {
+  return {
+    restrict: 'E',
+    require: '^dtBody',
+    transclude: true,
+    replace: true,
+    template: '<div ng-style="scrollerStyles()" ng-transclude></div>',
+    link: function link($scope, $elm, $attrs, ctrl) {
+      var parent = $elm.parent();
+
+      var ticking = false;
+      var lastScrollY = 0;
+      var lastScrollX = 0;
+
+      ctrl.options.internal.styleTranslator = new StyleTranslator(ctrl.options.rowHeight);
+
+      ctrl.options.internal.setYOffset = function (offsetY) {
+        parent[0].scrollTop = offsetY;
+      };
+
+      function update() {
+        ctrl.options.internal.offsetY = lastScrollY;
+        ctrl.options.internal.offsetX = lastScrollX;
+        ctrl.updatePage();
+
+        if (ctrl.options.scrollbarV) {
+          ctrl.getRows(true);
+        }
+
+        ctrl.options.$outer.$digest();
+
+        ticking = false;
+      }
+
+      function requestTick() {
+        if (!ticking) {
+          requestAnimFrame(update);
+          ticking = true;
+        }
+      }
+
+      parent.on('scroll', function onScroll() {
+        lastScrollY = this.scrollTop;
+        lastScrollX = this.scrollLeft;
+
+        requestTick();
+      });
+
+      $scope.$on('$destroy', function () {
+        parent.off('scroll');
+      });
+
+      $scope.scrollerStyles = function () {
+        if (ctrl.options.scrollbarV) {
+          return {
+            height: ctrl.count * ctrl.options.rowHeight + 'px'
+          };
+        }
+
+        return undefined;
+      };
+    }
+  };
+}
+
+/**
+ * Shortcut for key handlers
+ * @type {Object}
+ */
+var KEYS = {
+  BACKSPACE: 8,
+  TAB: 9,
+  RETURN: 13,
+  ALT: 18,
+  ESC: 27,
+  SPACE: 32,
+  PAGE_UP: 33,
+  PAGE_DOWN: 34,
+  END: 35,
+  HOME: 36,
+  LEFT: 37,
+  UP: 38,
+  RIGHT: 39,
+  DOWN: 40,
+  DELETE: 46,
+  COMMA: 188,
+  PERIOD: 190,
+  A: 65,
+  Z: 90,
+  ZERO: 48,
+  NUMPAD_0: 96,
+  NUMPAD_9: 105
+};
+
+var SelectionController = function () {
+
+  /* @ngInject*/
+  SelectionController.$inject = ["$scope"];
+  function SelectionController($scope) {
+    _classCallCheck(this, SelectionController);
+
+    this.body = $scope.body;
+    this.options = $scope.body.options;
+    this.selected = $scope.body.selected;
+  }
+
+  /**
+   * Handler for the keydown on a row
+   * @param  {event}
+   * @param  {index}
+   * @param  {row}
+   */
+
+
+  _createClass(SelectionController, [{
+    key: 'keyDown',
+    value: function keyDown(ev, index, row) {
+      if (KEYS[ev.keyCode]) {
+        ev.preventDefault();
+      }
+
+      if (ev.keyCode === KEYS.DOWN) {
+        var next = ev.target.nextElementSibling;
+        if (next) {
+          next.focus();
+        }
+      } else if (ev.keyCode === KEYS.UP) {
+        var prev = ev.target.previousElementSibling;
+        if (prev) {
+          prev.focus();
+        }
+      } else if (ev.keyCode === KEYS.RETURN) {
+        this.selectRow(index, row);
+      }
+    }
+
+    /**
+     * Handler for the row click event
+     * @param  {object} event
+     * @param  {int} index
+     * @param  {object} row
+     */
+
+  }, {
+    key: 'rowClicked',
+    value: function rowClicked(event, index, row) {
+      if (!this.options.checkboxSelection) {
+        // event.preventDefault();
+        this.selectRow(event, index, row);
+      }
+
+      this.body.onRowClick({ row: row });
+    }
+
+    /**
+     * Handler for the row double click event
+     * @param  {object} event
+     * @param  {int} index
+     * @param  {object} row
+     */
+
+  }, {
+    key: 'rowDblClicked',
+    value: function rowDblClicked(event, index, row) {
+      if (!this.options.checkboxSelection) {
+        event.preventDefault();
+        this.selectRow(event, index, row);
+      }
+
+      this.body.onRowDblClick({ row: row });
+    }
+
+    /**
+     * Invoked when a row directive's checkbox was changed.
+     * @param  {index}
+     * @param  {row}
+     */
+
+  }, {
+    key: 'onCheckboxChange',
+    value: function onCheckboxChange(event, index, row) {
+      this.selectRow(event, index, row);
+    }
+
+    /**
+     * Selects a row and places in the selection collection
+     * @param  {index}
+     * @param  {row}
+     */
+
+  }, {
+    key: 'selectRow',
+    value: function selectRow(event, index, row) {
+      if (this.options.selectable) {
+        if (this.options.multiSelect) {
+          var isShiftKeyDown = event.shiftKey;
+
+          if (isShiftKeyDown) {
+            this.selectRowsBetween(index, row);
+          } else {
+            var idx = this.selected.indexOf(row);
+            if (idx > -1) {
+              this.selected.splice(idx, 1);
+            } else {
+              if (this.options.multiSelectOnShift && this.selected.length === 1) {
+                this.selected.splice(0, 1);
+              }
+              this.selected.push(row);
+              this.body.onSelect({ rows: [row] });
+            }
+          }
+          this.prevIndex = index;
+        } else {
+          this.selected = row;
+          this.body.onSelect({ rows: [row] });
+        }
+      }
+    }
+
+    /**
+     * Selects the rows between a index.  Used for shift click selection.
+     * @param  {index}
+     */
+
+  }, {
+    key: 'selectRowsBetween',
+    value: function selectRowsBetween(index) {
+      var reverse = index < this.prevIndex;
+      var selecteds = [];
+
+      for (var i = 0, len = this.body.rows.length; i < len; i += 1) {
+        var row = this.body.rows[i];
+        var greater = i >= this.prevIndex && i <= index;
+        var lesser = i <= this.prevIndex && i >= index;
+
+        var range = {};
+        if (reverse) {
+          range = {
+            start: index,
+            end: this.prevIndex - index
+          };
+        } else {
+          range = {
+            start: this.prevIndex,
+            end: index + 1
+          };
+        }
+
+        if (reverse && lesser || !reverse && greater) {
+          var idx = this.selected.indexOf(row);
+          // if reverse shift selection (unselect) and the
+          // row is already selected, remove it from selected
+          if (reverse && idx > -1) {
+            this.selected.splice(idx, 1);
+
+            // if in the positive range to be added to `selected`, and
+            // not already in the selected array, add it
+          } else if (i >= range.start && i < range.end && idx === -1) {
+            this.selected.push(row);
+            selecteds.push(row);
+          }
+        }
+
+        this.body.onSelect({ rows: selecteds });
+      }
+    }
+  }]);
+
+  return SelectionController;
+}();
+
+function SelectionDirective() {
+  return {
+    controller: SelectionController,
+    restrict: 'A',
+    require: '^dtBody',
+    controllerAs: 'selCtrl'
+  };
+}
+
+var RowController = function () {
+  function RowController() {
+    _classCallCheck(this, RowController);
+  }
+
+  _createClass(RowController, [{
+    key: 'getValue',
+
+
+    /**
+     * Returns the value for a given column
+     * @param  {col}
+     * @return {value}
+     */
+    value: function getValue(col) {
+      if (!col.prop) return '';
+      return DeepValueGetter(this.row, col.prop);
+    }
+
+    /**
+     * Invoked when a cell triggers the tree toggle
+     * @param  {cell}
+     */
+
+  }, {
+    key: 'onTreeToggled',
+    value: function onTreeToggled(cell) {
+      this.onTreeToggle({
+        cell: cell,
+        row: this.row
+      });
+    }
+
+    /**
+     * Calculates the styles for a pin group
+     * @param  {group}
+     * @return {styles object}
+     */
+
+  }, {
+    key: 'stylesByGroup',
+    value: function stylesByGroup(group) {
+      var styles = {
+        width: this.columnWidths[group] + 'px'
+      };
+
+      if (group === 'left') {
+        TranslateXY(styles, this.options.internal.offsetX, 0);
+      } else if (group === 'right') {
+        var offset = (this.columnWidths.total - this.options.internal.innerWidth - this.options.internal.offsetX + this.options.internal.scrollBarWidth) * -1;
+        TranslateXY(styles, offset, 0);
+      }
+
+      return styles;
+    }
+
+    /**
+     * Invoked when the cell directive's checkbox changed state
+     */
+
+  }, {
+    key: 'onCheckboxChanged',
+    value: function onCheckboxChanged(ev) {
+      this.onCheckboxChange({
+        $event: ev,
+        row: this.row
+      });
+    }
+  }]);
+
+  return RowController;
+}();
+
+function RowDirective() {
+  return {
+    restrict: 'E',
+    controller: RowController,
+    controllerAs: 'rowCtrl',
+    scope: true,
+    bindToController: {
+      row: '=',
+      columns: '=',
+      columnWidths: '=',
+      expanded: '=',
+      selected: '=',
+      hasChildren: '=',
+      options: '=',
+      onCheckboxChange: '&',
+      onTreeToggle: '&'
+    },
+    link: function link($scope, $elm, $attrs, ctrl) {
+      if (ctrl.row) {
+        // inital render position
+        TranslateXY($elm[0].style, 0, ctrl.row.$$index * ctrl.options.rowHeight);
+      }
+
+      // register w/ the style translator
+      ctrl.options.internal.styleTranslator.register($scope.$index, $elm);
+    },
+
+    template: '\n      <div class="dt-row">\n        <div class="dt-row-left dt-row-block"\n             ng-if="rowCtrl.columns[\'left\'].length"\n             ng-style="rowCtrl.stylesByGroup(\'left\')">\n          <dt-cell ng-repeat="column in rowCtrl.columns[\'left\'] track by column.$id"\n                   on-tree-toggle="rowCtrl.onTreeToggled(cell)"\n                   column="column"\n                   options="rowCtrl.options"\n                   has-children="rowCtrl.hasChildren"\n                   on-checkbox-change="rowCtrl.onCheckboxChanged($event)"\n                   selected="rowCtrl.selected"\n                   expanded="rowCtrl.expanded"\n                   row="rowCtrl.row"\n                   value="rowCtrl.getValue(column)">\n          </dt-cell>\n        </div>\n        <div class="dt-row-center dt-row-block"\n             ng-style="rowCtrl.stylesByGroup(\'center\')">\n          <dt-cell ng-repeat="column in rowCtrl.columns[\'center\'] track by column.$id"\n                   on-tree-toggle="rowCtrl.onTreeToggled(cell)"\n                   column="column"\n                   options="rowCtrl.options"\n                   has-children="rowCtrl.hasChildren"\n                   expanded="rowCtrl.expanded"\n                   selected="rowCtrl.selected"\n                   row="rowCtrl.row"\n                   on-checkbox-change="rowCtrl.onCheckboxChanged($event)"\n                   value="rowCtrl.getValue(column)">\n          </dt-cell>\n        </div>\n        <div class="dt-row-right dt-row-block"\n             ng-if="rowCtrl.columns[\'right\'].length"\n             ng-style="rowCtrl.stylesByGroup(\'right\')">\n          <dt-cell ng-repeat="column in rowCtrl.columns[\'right\'] track by column.$id"\n                   on-tree-toggle="rowCtrl.onTreeToggled(cell)"\n                   column="column"\n                   options="rowCtrl.options"\n                   has-children="rowCtrl.hasChildren"\n                   selected="rowCtrl.selected"\n                   on-checkbox-change="rowCtrl.onCheckboxChanged($event)"\n                   row="rowCtrl.row"\n                   expanded="rowCtrl.expanded"\n                   value="rowCtrl.getValue(column)">\n          </dt-cell>\n        </div>\n      </div>',
+    replace: true
+  };
+}
+
+var GroupRowController = function () {
+  function GroupRowController() {
+    _classCallCheck(this, GroupRowController);
+  }
+
+  _createClass(GroupRowController, [{
+    key: 'onGroupToggled',
+    value: function onGroupToggled(evt) {
+      evt.stopPropagation();
+      this.onGroupToggle({
+        group: this.row
+      });
+    }
+  }, {
+    key: 'treeClass',
+    value: function treeClass() {
+      return {
+        'dt-tree-toggle': true,
+        'icon-right': !this.expanded,
+        'icon-down': this.expanded
+      };
+    }
+  }]);
+
+  return GroupRowController;
+}();
+
+function GroupRowDirective() {
+  return {
+    restrict: 'E',
+    controller: GroupRowController,
+    controllerAs: 'group',
+    bindToController: {
+      row: '=',
+      onGroupToggle: '&',
+      expanded: '=',
+      options: '='
+    },
+    scope: true,
+    replace: true,
+    template: '\n      <div class="dt-group-row">\n        <span ng-class="group.treeClass()"\n              ng-click="group.onGroupToggled($event)">\n        </span>\n        <span class="dt-group-row-label" ng-bind="group.row.name">\n        </span>\n      </div>',
+    link: function link($scope, $elm, $attrs, ctrl) {
+      // inital render position
+      TranslateXY($elm[0].style, 0, ctrl.row.$$index * ctrl.options.rowHeight);
+
+      // register w/ the style translator
+      ctrl.options.internal.styleTranslator.register($scope.$index, $elm);
+    }
+  };
+}
+
+var CellController = function () {
+  function CellController() {
+    _classCallCheck(this, CellController);
+  }
+
+  _createClass(CellController, [{
+    key: 'styles',
+
+
+    /**
+     * Calculates the styles for the Cell Directive
+     * @return {styles object}
+     */
+    value: function styles() {
+      return {
+        width: this.column.width + 'px',
+        'min-width': this.column.width + 'px'
+      };
+    }
+
+    /**
+     * Calculates the css classes for the cell directive
+     * @param  {column}
+     * @return {class object}
+     */
+
+  }, {
+    key: 'cellClass',
+    value: function cellClass() {
+      var style = {
+        'dt-tree-col': this.column.isTreeColumn
+      };
+
+      if (this.column.className) {
+        style[this.column.className] = true;
+      }
+
+      return style;
+    }
+
+    /**
+     * Calculates the tree class styles.
+     * @return {css classes object}
+     */
+
+  }, {
+    key: 'treeClass',
+    value: function treeClass() {
+      return {
+        'dt-tree-toggle': true,
+        'icon-right': !this.expanded,
+        'icon-down': this.expanded
+      };
+    }
+
+    /**
+     * Invoked when the tree toggle button was clicked.
+     * @param  {event}
+     */
+
+  }, {
+    key: 'onTreeToggled',
+    value: function onTreeToggled(evt) {
+      evt.stopPropagation();
+      this.expanded = !this.expanded;
+      this.onTreeToggle({
+        cell: {
+          value: this.value,
+          column: this.column,
+          expanded: this.expanded
+        }
+      });
+    }
+
+    /**
+     * Invoked when the checkbox was changed
+     * @param  {object} event
+     */
+
+  }, {
+    key: 'onCheckboxChanged',
+    value: function onCheckboxChanged(event) {
+      event.stopPropagation();
+      this.onCheckboxChange({ $event: event });
+    }
+
+    /**
+     * Returns the value in its fomatted form
+     * @return {string} value
+     */
+
+  }, {
+    key: 'getValue',
+    value: function getValue() {
+      var val = this.column.cellDataGetter ? this.column.cellDataGetter(this.value) : this.value;
+
+      if (angular.isUndefined(val) || val === null) {
+        val = '';
+      }
+
+      return val;
+    }
+  }]);
+
+  return CellController;
+}();
+
+function CellDirective($rootScope, $compile) {
+  return {
+    restrict: 'E',
+    controller: CellController,
+    scope: true,
+    controllerAs: 'cell',
+    bindToController: {
+      options: '=',
+      value: '=',
+      selected: '=',
+      column: '=',
+      row: '=',
+      expanded: '=',
+      hasChildren: '=',
+      onTreeToggle: '&',
+      onCheckboxChange: '&'
+    },
+    template: '<div class="dt-cell"\n            data-title="{{::cell.column.name}}"\n            ng-style="cell.styles()"\n            ng-class="cell.cellClass()">\n        <label ng-if="cell.column.isCheckboxColumn" class="dt-checkbox">\n          <input type="checkbox"\n                 ng-checked="cell.selected"\n                 ng-click="cell.onCheckboxChanged($event)" />\n        </label>\n        <span ng-if="cell.column.isTreeColumn && cell.hasChildren"\n              ng-class="cell.treeClass()"\n              ng-click="cell.onTreeToggled($event)"></span>\n        <span class="dt-cell-content"></span>\n      </div>',
+    replace: true,
+    compile: function compile() {
+      return {
+        pre: function pre($scope, $elm, $attrs, ctrl) {
+          var content = angular.element($elm[0].querySelector('.dt-cell-content'));
+
+          var cellScope = void 0;
+
+          // extend the outer scope onto our new cell scope
+          if (ctrl.column.template || ctrl.column.cellRenderer) {
+            createCellScope();
+          }
+
+          $scope.$watch('cell.row', function () {
+            if (cellScope) {
+              cellScope.$destroy();
+
+              createCellScope();
+
+              cellScope.$cell = ctrl.value;
+              cellScope.$row = ctrl.row;
+              cellScope.$column = ctrl.column;
+              cellScope.$$watchers = null;
+            }
+
+            if (ctrl.column.template) {
+              content.empty();
+              var elm = angular.element('<span>' + ctrl.column.template.trim() + '</span>');
+              content.append($compile(elm)(cellScope));
+            } else if (ctrl.column.cellRenderer) {
+              content.empty();
+              var _elm2 = angular.element(ctrl.column.cellRenderer(cellScope, content));
+              content.append($compile(_elm2)(cellScope));
+            } else {
+              content[0].innerHTML = ctrl.getValue();
+            }
+          }, true);
+
+          function createCellScope() {
+            cellScope = ctrl.options.$outer.$new(false);
+            cellScope.getValue = ctrl.getValue;
+          }
+        }
+      };
+    }
+  };
+}
+
+var FooterController = function () {
+  /**
+   * Creates an instance of the Footer Controller
+   * @param  {scope}
+   * @return {[type]}
+   */
+
+  /* @ngInject*/
+  FooterController.$inject = ["$scope"];
+  function FooterController($scope) {
+    _classCallCheck(this, FooterController);
+
+    _extends(this, {
+      $scope: $scope
+    });
+
+    if (isOldAngular()) {
+      this.$onInit();
+    }
+  }
+
+  _createClass(FooterController, [{
+    key: '$onInit',
+    value: function $onInit() {
+      this.init();
+    }
+  }, {
+    key: 'init',
+    value: function init() {
+      var _this10 = this;
+
+      this.page = this.paging.offset + 1;
+
+      this.$scope.$watch('footer.paging.offset', function (newVal) {
+        _this10.offsetChanged(newVal);
+      });
+    }
+
+    /**
+     * The offset ( page ) changed externally, update the page
+     * @param  {new offset}
+     */
+
+  }, {
+    key: 'offsetChanged',
+    value: function offsetChanged(newVal) {
+      this.page = newVal + 1;
+    }
+
+    /**
+     * The pager was invoked
+     * @param  {scope}
+     */
+
+  }, {
+    key: 'onPaged',
+    value: function onPaged(page) {
+      this.paging.offset = page - 1;
+      this.onPage({
+        offset: this.paging.offset,
+        size: this.paging.size
+      });
+    }
+  }]);
+
+  return FooterController;
+}();
+
+function FooterDirective() {
+  return {
+    restrict: 'E',
+    controller: FooterController,
+    controllerAs: 'footer',
+    scope: true,
+    bindToController: {
+      paging: '=',
+      onPage: '&'
+    },
+    template: '<div class="dt-footer">\n        <div class="page-count">{{footer.paging.count}} total</div>\n        <dt-pager page="footer.page"\n               size="footer.paging.size"\n               count="footer.paging.count"\n               on-page="footer.onPaged(page)"\n               ng-show="footer.paging.count / footer.paging.size > 1">\n         </dt-pager>\n      </div>',
+    replace: true
+  };
+}
+
+var PagerController = function () {
+  /**
+   * Creates an instance of the Pager Controller
+   * @param  {object} $scope
+   */
+
+  /* @ngInject*/
+  PagerController.$inject = ["$scope"];
+  function PagerController($scope) {
+    _classCallCheck(this, PagerController);
+
+    _extends(this, {
+      $scope: $scope
+    });
+
+    if (isOldAngular()) {
+      this.$onInit();
+    }
+  }
+
+  _createClass(PagerController, [{
+    key: '$onInit',
+    value: function $onInit() {
+      this.init();
+    }
+  }, {
+    key: 'init',
+    value: function init() {
+      var _this11 = this;
+
+      this.$scope.$watch('pager.count', function () {
+        _this11.findAndSetPages();
+      });
+
+      this.$scope.$watch('pager.size', function () {
+        _this11.findAndSetPages();
+      });
+
+      this.$scope.$watch('pager.page', function (newVal) {
+        if (newVal !== 0 && newVal <= _this11.totalPages) {
+          _this11.getPages(newVal);
+        }
+      });
+
+      if (this.size && this.count && this.page) {
+        this.findAndSetPages();
+      }
+    }
+  }, {
+    key: 'findAndSetPages',
+    value: function findAndSetPages() {
+      this.calcTotalPages(this.size, this.count);
+      this.getPages(this.page || 1);
+    }
+
+    /**
+     * Calculates the total number of pages given the count.
+     * @return {int} page count
+     */
+
+  }, {
+    key: 'calcTotalPages',
+    value: function calcTotalPages(size, count) {
+      var localCount = size < 1 ? 1 : Math.ceil(count / size);
+
+      this.totalPages = Math.max(localCount || 0, 1);
+    }
+
+    /**
+     * Select a page
+     * @param  {int} num
+     */
+
+  }, {
+    key: 'selectPage',
+    value: function selectPage(num) {
+      if (num > 0 && num <= this.totalPages) {
+        this.page = num;
+        this.onPage({
+          page: num
+        });
+      }
+    }
+
+    /**
+     * Selects the previous pager
+     */
+
+  }, {
+    key: 'prevPage',
+    value: function prevPage() {
+      if (this.canPrevious()) {
+        this.selectPage(this.page -= 1);
+      }
+    }
+
+    /**
+     * Selects the next page
+     */
+
+  }, {
+    key: 'nextPage',
+    value: function nextPage() {
+      if (this.canNext()) {
+        this.selectPage(this.page += 1);
+      }
+    }
+
+    /**
+     * Determines if the pager can go previous
+     * @return {boolean}
+     */
+
+  }, {
+    key: 'canPrevious',
+    value: function canPrevious() {
+      return this.page > 1;
+    }
+
+    /**
+     * Determines if the pager can go forward
+     * @return {boolean}
+     */
+
+  }, {
+    key: 'canNext',
+    value: function canNext() {
+      return this.page < this.totalPages;
+    }
+
+    /**
+     * Gets the page set given the current page
+     * @param  {int} page
+     */
+
+  }, {
+    key: 'getPages',
+    value: function getPages(page) {
+      var pages = [];
+      var maxSize = 5;
+      var isMaxSized = maxSize < this.totalPages;
+
+      var startPage = 1;
+      var endPage = this.totalPages;
+
+      if (isMaxSized) {
+        startPage = (Math.ceil(page / maxSize) - 1) * maxSize + 1;
+        endPage = Math.min(startPage + maxSize - 1, this.totalPages);
+      }
+
+      for (var number = startPage; number <= endPage; number += 1) {
+        pages.push({
+          number: number,
+          text: number,
+          active: number === page
+        });
+      }
+
+      /*
+      if (isMaxSized) {
+        if (startPage > 1) {
+          pages.unshift({
+            number: startPage - 1,
+            text: '...'
+          });
+        }
+          if (endPage < this.totalPages) {
+          pages.push({
+            number: endPage + 1,
+            text: '...'
+          });
+        }
+      }
+      */
+
+      this.pages = pages;
+    }
+  }]);
+
+  return PagerController;
+}();
+
+function PagerDirective() {
+  return {
+    restrict: 'E',
+    controller: PagerController,
+    controllerAs: 'pager',
+    scope: true,
+    bindToController: {
+      page: '=',
+      size: '=',
+      count: '=',
+      onPage: '&'
+    },
+    template: '<div class="dt-pager">\n        <ul class="pager">\n          <li ng-class="{ disabled: !pager.canPrevious() }">\n            <a href ng-click="pager.selectPage(1)" class="icon-prev"></a>\n          </li>\n          <li ng-class="{ disabled: !pager.canPrevious() }">\n            <a href ng-click="pager.prevPage()" class="icon-left"></a>\n          </li>\n          <li ng-repeat="pg in pager.pages track by $index" ng-class="{ active: pg.active }">\n            <a href ng-click="pager.selectPage(pg.number)">{{pg.text}}</a>\n          </li>\n          <li ng-class="{ disabled: !pager.canNext() }">\n            <a href ng-click="pager.nextPage()" class="icon-right"></a>\n          </li>\n          <li ng-class="{ disabled: !pager.canNext() }">\n            <a href ng-click="pager.selectPage(pager.totalPages)" class="icon-skip"></a>\n          </li>\n        </ul>\n      </div>',
+    replace: true
+  };
+}
+
+var POSITION = {
+  LEFT: 'left',
+  RIGHT: 'right',
+  TOP: 'top',
+  BOTTOM: 'bottom',
+  CENTER: 'center',
+  MIDDLE: 'middle'
+};
+
+/**
+ * Popover Directive
+ * @param {function} $animate
+ * @param {function} $compile
+ * @param {function} $document
+ * @param {function} $http
+ * @param {object} $q
+ * @param {function} $templateCache
+ * @param {function} $timeout
+ * @param {function} PopoverRegistry
+ * @param {function} PositionHelper
+ */
+
+function PopoverDirective($animate, $compile, $document, $http, $q, $templateCache, $timeout, PopoverRegistry, PositionHelper) {
+  /**
+   * Loads a template from the template cache
+   * @param  {string} template
+   * @param  {boolean} plain
+   * @return {object}  html template
+   */
+  function loadTemplate(template, plain) {
+    if (!template) {
+      return '';
+    }
+
+    if (angular.isString(template) && plain) {
+      return template;
+    }
+
+    return $templateCache.get(template) || $http.get(template, { cache: true });
+  }
+
+  /**
+   * Determines a boolean given a value
+   * @param  {object} value
+   * @return {boolean}
+   */
+  function toBoolean(value) {
+    if (value && value.length !== 0) {
+      var v = value.toString().toLowerCase();
+      value = v === 'true';
+    } else {
+      value = false;
+    }
+
+    return value;
+  }
+
+  return {
+    restrict: 'A',
+    scope: true,
+    replace: false,
+    link: function link($scope, $element, $attributes) {
+      $scope.popover = null;
+
+      $scope.options = {
+        alignment: $attributes.popoverAlignment || 'middle',
+        placement: $attributes.popoverPlacement || 'right',
+        plain: toBoolean($attributes.popoverPlain || false),
+        popoverId: $attributes.popoverId,
+        showCaret: toBoolean($attributes.popoverPlain || false),
+        spacing: parseInt($attributes.popoverSpacing, 10) || 0,
+        template: $attributes.popoverTemplate,
+        text: $attributes.popoverText
+      };
+
+      $scope.$on('$destroy', function () {
+        $element.off();
+      });
+
+      // attach mouse events to element
+      $element.on('mouseenter', display);
+      $element.on('mouseleave', beginTimeout);
+      $element.on('mousemove', cancelTimeout);
+
+      /**
+       * Begin a timeout of 500ms before hiding popover
+       */
+      function beginTimeout() {
+        $scope.exitTimeout = $timeout(remove, 500);
+      }
+
+      /**
+       * Cancel the timeout to keep popover visible
+       */
+      function cancelTimeout() {
+        $timeout.cancel($scope.exitTimeout);
+      }
+
+      /**
+       * Displays the popover on the page
+       */
+      function display() {
+        // Cancel exit timeout
+        cancelTimeout();
+
+        var elm = $document[0].getElementById($scope.options.popoverId);
+        if ($scope.popover && elm) return;
+
+        if ($scope.options.text && !$scope.options.template) {
+          displayTextPopover();
+        } else {
+          displayTemplatePopover();
+        }
+      }
+
+      /**
+       * When using template, load and compile the template prior to appending popover
+       */
+      function displayTemplatePopover() {
+        $q.when(loadTemplate($scope.options.template, $scope.options.plain)).then(function (template) {
+          if (!angular.isString(template)) {
+            if (template.data && angular.isString(template.data)) {
+              template = template.data;
+            } else {
+              template = '';
+            }
+          }
+
+          buildElement('template');
+
+          $scope.popover.html(template);
+          $compile($scope.popover)($scope);
+          angular.element($document.body).append($scope.popover);
+          positionPopover($element, $scope.popover, $scope.options);
+
+          managePopover();
+        });
+      }
+
+      /**
+       * With text only, simply build up the popover and append it to body
+       */
+      function displayTextPopover() {
+        buildElement('text');
+
+        $scope.popover.html($scope.options.text);
+        angular.element($document[0].body).append($scope.popover);
+
+        managePopover();
+      }
+
+      function buildElement(type) {
+        $scope.popover = angular.element('<div\n          class="dt-popover popover' + $scope.options.placement + '"\n          id="' + $scope.options.popoverId + '"></div>');
+
+        if (type === 'text') {
+          $scope.popover.addClass('popover-text');
+        }
+      }
+
+      /**
+       * Position popover, bind handlers, and register popover
+       */
+      function managePopover() {
+        positionPopover($element, $scope.popover, $scope.options);
+
+        // attach mouse events to popover
+        $scope.popover.on('mouseleave', beginTimeout);
+        $scope.popover.on('mousemove', cancelTimeout);
+
+        PopoverRegistry.add($scope.options.popoverId, {
+          element: $element,
+          popover: $scope.popover
+        });
+      }
+
+      /**
+       * Removes the template from the registry and page
+       */
+      function remove() {
+        if ($scope.popover) {
+          $scope.popover.off();
+          $scope.popover.remove();
+        }
+
+        $scope.popover = null;
+        PopoverRegistry.remove($scope.options.popoverId);
+      }
+
+      /**
+       * Positions the popover
+       * @param  {object} triggerElement
+       * @param  {object} popover
+       * @param  {object} options
+       */
+      function positionPopover(triggerElement, popover, options) {
+        $timeout(function () {
+          var elDimensions = triggerElement[0].getBoundingClientRect();
+          var popoverDimensions = popover[0].getBoundingClientRect();
+
+          var top = void 0;
+          var left = void 0;
+
+          if (options.placement === POSITION.RIGHT) {
+            left = elDimensions.left + elDimensions.width + options.spacing;
+            top = calculateVerticalAlignment();
+          } else if (options.placement === POSITION.LEFT) {
+            left = elDimensions.left - popoverDimensions.width - options.spacing;
+            top = calculateVerticalAlignment();
+          } else if (options.placement === POSITION.TOP) {
+            top = elDimensions.top - popoverDimensions.height - options.spacing;
+            left = calculateHorizontalAlignment();
+          } else if (options.placement === POSITION.BOTTOM) {
+            top = elDimensions.top + elDimensions.height + options.spacing;
+            left = calculateHorizontalAlignment();
+          }
+
+          function calculateVerticalAlignment() {
+            return PositionHelper.calculateVerticalAlignment(elDimensions, popoverDimensions, options.alignment);
+          }
+
+          function calculateHorizontalAlignment() {
+            return PositionHelper.calculateHorizontalAlignment(elDimensions, popoverDimensions, options.alignment);
+          }
+
+          popover.css({
+            top: top + 'px',
+            left: left + 'px',
+            height: '300px'
+          });
+
+          if ($scope.options.showCaret) {
+            addCaret($scope.popover, elDimensions, popoverDimensions);
+          }
+
+          $animate.addClass($scope.popover, 'popover-animation');
+        }, 50);
+      }
+
+      /**
+       * Adds a caret and positions it relatively to the popover
+       * @param {object} popoverEl
+       * @param {object} elDimensions
+       * @param {object} popoverDimensions
+       */
+      function addCaret(popoverEl, elDimensions, popoverDimensions) {
+        var caret = angular.element('<span class="popover-caret caret-' + $scope.options.placement + '"></span>');
+        popoverEl.append(caret);
+        var caretDimensions = caret[0].getBoundingClientRect();
+
+        var left = void 0;
+        var top = void 0;
+
+        if ($scope.options.placement === POSITION.RIGHT) {
+          left = -6;
+          top = calculateVerticalCaret();
+        } else if ($scope.options.placement === POSITION.LEFT) {
+          left = popoverDimensions.width - 2;
+          top = calculateVerticalCaret();
+        } else if ($scope.options.placement === POSITION.TOP) {
+          top = popoverDimensions.height - 5;
+          left = calculateHorizontalCaret();
+        } else if ($scope.options.placement === POSITION.BOTTOM) {
+          top = -8;
+          left = calculateHorizontalCaret();
+        }
+
+        function calculateVerticalCaret() {
+          return PositionHelper.calculateVerticalCaret(elDimensions, popoverDimensions, caretDimensions, $scope.options.alignment);
+        }
+
+        function calculateHorizontalCaret() {
+          return PositionHelper.calculateHorizontalCaret(elDimensions, popoverDimensions, caretDimensions, $scope.options.alignment);
+        }
+
+        caret.css({
+          top: top + 'px',
+          left: left + 'px'
+        });
+      }
+    }
+  };
+}
+
+function PopoverRegistry() {
+  var popovers = {};
+
+  return {
+    add: function add(id, object) {
+      popovers[id] = object;
+      return popovers[id];
+    },
+    find: function find(id) {
+      return popovers[id];
+    },
+    remove: function remove(id) {
+      delete popovers[id];
+    }
+  };
+}
+
+/**
+ * Position helper for the popover directive.
+ */
+
+/* eslint-disable angular/log */
+
+/* @ngInject */
+function PositionHelper($log) {
+  function subtractAll(items) {
+    var total = 0;
+
+    items.forEach(function (count, index) {
+      total = index === 0 ? total += count : total -= count;
+    });
+
+    return total;
+  }
+
+  return {
+    calculateHorizontalAlignment: function calculateHorizontalAlignment(elDimensions, popoverDimensions, alignment) {
+      switch (alignment) {
+        case POSITION.LEFT:
+          return elDimensions.left;
+        case POSITION.RIGHT:
+          return elDimensions.left + (elDimensions.width - popoverDimensions.width);
+        case POSITION.CENTER:
+          return elDimensions.left + (elDimensions.width / 2 - popoverDimensions.width / 2);
+        default:
+          return $log.warn('calculateHorizontalAlignment issue', this);
+      }
+    },
+    calculateVerticalAlignment: function calculateVerticalAlignment(elDimensions, popoverDimensions, alignment) {
+      switch (alignment) {
+        case POSITION.TOP:
+          return elDimensions.top;
+        case POSITION.BOTTOM:
+          return elDimensions.top + (elDimensions.height - popoverDimensions.height);
+        case POSITION.MIDDLE:
+          return elDimensions.top + (elDimensions.height / 2 - popoverDimensions.height / 2);
+        default:
+          return $log.warn('calculateVerticalAlignment issue', this);
+      }
+    },
+    calculateVerticalCaret: function calculateVerticalCaret(elDimensions, popoverDimensions, caretDimensions, alignment) {
+      switch (alignment) {
+        case POSITION.TOP:
+          return subtractAll([elDimensions.height / 2, caretDimensions.height / 2, 1]);
+        case POSITION.BOTTOM:
+          return subtractAll([popoverDimensions.height, elDimensions.height / 2, caretDimensions.height / 2, 1]);
+        case POSITION.MIDDLE:
+          return subtractAll([popoverDimensions.height / 2, caretDimensions.height / 2, 1]);
+        default:
+          return $log.warn('calculateVerticalCaret issue', this);
+      }
+    },
+    calculateHorizontalCaret: function calculateHorizontalCaret(elDimensions, popoverDimensions, caretDimensions, alignment) {
+      switch (alignment) {
+        case POSITION.LEFT:
+          return subtractAll([elDimensions.width / 2, caretDimensions.height / 2, 1]);
+        case POSITION.RIGHT:
+          return subtractAll([popoverDimensions.width, elDimensions.width / 2, caretDimensions.height / 2, 1]);
+        case POSITION.CENTER:
+          return subtractAll([popoverDimensions.width / 2, caretDimensions.height / 2, 1]);
+        default:
+          return $log.warn('calculateHorizontalCaret issue', this);
+      }
+    }
+  };
+}
+
+var popover = angular.module('dt.popover', []).factory('PopoverRegistry', PopoverRegistry).factory('PositionHelper', PositionHelper).directive('popover', PopoverDirective);
+
+var MenuController = function () {
+
+  /* @ngInject */
+  MenuController.$inject = ["$scope"];
+  function MenuController($scope) {
+    _classCallCheck(this, MenuController);
+
+    this.$scope = $scope;
+  }
+
+  _createClass(MenuController, [{
+    key: 'getColumnIndex',
+    value: function getColumnIndex(model) {
+      return this.$scope.current.findIndex(function (col) {
+        return model.name === col.name;
+      });
+    }
+  }, {
+    key: 'isChecked',
+    value: function isChecked(model) {
+      return this.getColumnIndex(model) > -1;
+    }
+  }, {
+    key: 'onCheck',
+    value: function onCheck(model) {
+      var idx = this.getColumnIndex(model);
+      if (idx === -1) {
+        this.$scope.current.push(model);
+      } else {
+        this.$scope.current.splice(idx, 1);
+      }
+    }
+  }]);
+
+  return MenuController;
+}();
+
+function MenuDirective() {
+  return {
+    restrict: 'E',
+    controller: 'MenuController',
+    controllerAs: 'dtm',
+    scope: {
+      current: '=',
+      available: '='
+    },
+    template: '<div class="dt-menu dropdown" close-on-click="false">\n        <a href="#" class="dropdown-toggle icon-add">\n          Configure Columns\n        </a>\n        <div class="dropdown-menu" role="menu" aria-labelledby="dropdown">\n          <div class="keywords">\n            <input type="text"\n                   click-select\n                   placeholder="Filter columns..."\n                   ng-model="columnKeyword"\n                   autofocus />\n          </div>\n          <ul>\n            <li ng-repeat="column in available | filter:columnKeyword">\n              <label class="dt-checkbox">\n                <input type="checkbox"\n                       ng-checked="dtm.isChecked(column)"\n                       ng-click="dtm.onCheck(column)">\n                {{column.name}}\n              </label>\n            </li>\n          </ul>\n        </div>\n      </div>'
+  };
+}
+
+var DropdownController = function () {
+  /* @ngInject*/
+  DropdownController.$inject = ["$scope"];
+  function DropdownController($scope) {
+    _classCallCheck(this, DropdownController);
+
+    _extends(this, {
+      $scope: $scope
+    });
+
+    $scope.open = false;
+  }
+
+  _createClass(DropdownController, [{
+    key: 'toggle',
+    value: function toggle() {
+      this.$scope.open = !this.$scope.open;
+    }
+  }]);
+
+  return DropdownController;
+}();
+
+function DropdownDirective($document, $timeout) {
+  return {
+    restrict: 'C',
+    controller: 'DropdownController',
+    link: function link($scope, $elm) {
+      function closeDropdown(ev) {
+        if ($elm[0].contains(ev.target)) {
+          return;
+        }
+
+        $timeout(function () {
+          $scope.open = false;
+          off();
+        });
+      }
+
+      function keydown(ev) {
+        if (ev.which === 27) {
+          $timeout(function () {
+            $scope.open = false;
+            off();
+          });
+        }
+      }
+
+      function off() {
+        $document.unbind('click', closeDropdown);
+        $document.unbind('keydown', keydown);
+      }
+
+      $scope.$watch('open', function (newVal) {
+        if (newVal) {
+          $document.bind('click', closeDropdown);
+          $document.bind('keydown', keydown);
+        }
+      });
+    }
+  };
+}
+
+function DropdownToggleDirective($timeout) {
+  return {
+    restrict: 'C',
+    controller: 'DropdownController',
+    require: '?^dropdown',
+    link: function link($scope, $elm, $attrs, ctrl) {
+      function toggleClick(event) {
+        event.preventDefault();
+        $timeout(function () {
+          ctrl.toggle();
+        });
+      }
+
+      function toggleDestroy() {
+        $elm.unbind('click', toggleClick);
+      }
+
+      $elm.bind('click', toggleClick);
+      $scope.$on('$destroy', toggleDestroy);
+    }
+  };
+}
+
+function DropdownMenuDirective($animate) {
+  return {
+    restrict: 'C',
+    require: '?^dropdown',
+    link: function link($scope, $elm) {
+      $scope.$watch('open', function () {
+        $animate[$scope.open ? 'addClass' : 'removeClass']($elm, 'ddm-open');
+      });
+    }
+  };
+}
+
+var dropdown = angular.module('dt.dropdown', []).controller('DropdownController', DropdownController).directive('dropdown', DropdownDirective).directive('dropdownToggle', DropdownToggleDirective).directive('dropdownMenu', DropdownMenuDirective);
+
+var menu = angular.module('dt.menu', [dropdown.name]).controller('MenuController', MenuController).directive('dtm', MenuDirective);
+
+var dataTable = angular.module('data-table', []).directive('dtable', DataTableDirective).directive('resizable', ResizableDirective).directive('sortable', SortableDirective).directive('dtHeader', HeaderDirective).directive('dtHeaderCell', HeaderCellDirective).directive('dtBody', BodyDirective).directive('dtScroller', ScrollerDirective).directive('dtSelection', SelectionDirective).directive('dtRow', RowDirective).directive('dtGroupRow', GroupRowDirective).directive('dtCell', CellDirective).directive('dtFooter', FooterDirective).directive('dtPager', PagerDirective);
+
+exports.dtPopover = popover;
+exports.dtMenu = menu;
+exports.default = dataTable;

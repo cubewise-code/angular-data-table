@@ -136,6 +136,20 @@ function releaser(RELEASE_TYPE) {
     .pipe(ngAnnotate({
       gulpWarnings: false,
     }))
+    .pipe(header(banner, { pkg }))
+    .pipe(rename(`dataTable${RELEASE_TYPE.EXTENSION}.js`))
+    .pipe(gulp.dest('release/'));
+}
+
+function releaserWithUglify(RELEASE_TYPE) {
+  return gulp.src('release/dataTable.es6.js')
+    .pipe(babel({
+      plugins: RELEASE_TYPE.PLUGINS,
+      moduleId: 'DataTable',
+    }))
+    .pipe(ngAnnotate({
+      gulpWarnings: false,
+    }))
     .pipe(uglify())
     .pipe(header(banner, { pkg }))
     .pipe(rename(`dataTable${RELEASE_TYPE.EXTENSION}.js`))
@@ -146,7 +160,7 @@ gulp.task('release-umd', () => releaser(RELEASE.UMD));
 
 gulp.task('release-common', () => releaser(RELEASE.COMMON));
 
-gulp.task('release-es6-min', () => releaser(RELEASE.MIN));
+gulp.task('release-es6-min', () => releaserWithUglify(RELEASE.MIN));
 
 //
 // Test Tasks
